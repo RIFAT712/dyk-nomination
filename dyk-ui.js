@@ -141,7 +141,7 @@ window.DYKUI = (function(Vue, Cdx) {
             const loading = ref(false);
             const previewHtml = ref('');
             const suggestions = ref([]);
-            const title = "DYK মনোনয়ন (Codex)";
+            const title = "আজাকি মনোনয়ন (Codex)";
 
             const form = reactive({
                 article: '',
@@ -288,9 +288,9 @@ window.DYKUI = (function(Vue, Cdx) {
                     await DYKCore.postNomination(
                         'টেমপ্লেট আলোচনা:আপনি জানেন কি',
                         wikitext,
-                        'DYK মনোনয়ন যোগ করা হয়েছে (Codex)'
+                        'আজাকি মনোনয়ন যোগ করা হয়েছে (Codex)'
                     );
-                    mw.notify('সফলভাবে DYK মনোনয়ন যুক্ত হয়েছে!');
+                    mw.notify('সফলভাবে আজাকি মনোনয়ন যুক্ত হয়েছে!');
                     close();
                     if (mw.config.get('wgPageName') === 'টেমপ্লেট_আলোচনা:আপনি_জানেন_কি') {
                         location.reload();
