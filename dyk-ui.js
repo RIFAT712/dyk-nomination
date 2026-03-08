@@ -32,10 +32,10 @@ window.DYKUI = (function(Vue, Cdx) {
             >
                 <div class="dyk-form">
                     <cdx-field :status="errors.article ? 'error' : 'default'" :messages="errors.article ? { error: errors.article } : {}">
-                        <template #label>à¦¨à¦¿à¦¬à¦¨à§à¦§à§‡à¦° à¦¨à¦¾à¦®</template>
+                        <template #label>নিবন্ধের নাম</template>
                         <cdx-text-input 
                             v-model="form.article" 
-                            placeholder="à¦¨à¦¿à¦¬à¦¨à§à¦§à§‡à¦° à¦¨à¦¾à¦® à¦ªà§à¦°à¦¦à¦¾à¦¨ à¦•à¦°à§à¦¨..."
+                            placeholder="নিবন্ধের নাম প্রদান করুন..."
                             @input="handleArticleInput"
                         />
                         <div v-if="suggestions.length" class="dyk-suggestions">
@@ -51,12 +51,12 @@ window.DYKUI = (function(Vue, Cdx) {
                     </cdx-field>
 
                     <cdx-field>
-                        <template #label>à¦®à¦¨à§‹à¦¨à¦¯à¦¼à¦¨à¦•à¦¾à¦°à§€à¦° à¦¨à¦¾à¦®</template>
+                        <template #label>মনোনয়নকারীর নাম</template>
                         <cdx-text-input :value="form.nominator" disabled />
                     </cdx-field>
 
                     <cdx-field>
-                        <template #label>à¦¨à¦¿à¦¬à¦¨à§à¦§à§‡à¦° à¦…à¦¬à¦¸à§à¦¥à¦¾</template>
+                        <template #label>নিবন্ধের অবস্থা</template>
                         <cdx-select
                             v-model:selected="form.status"
                             :menu-items="statusOptions"
@@ -64,44 +64,44 @@ window.DYKUI = (function(Vue, Cdx) {
                     </cdx-field>
 
                     <cdx-field :status="errors.image ? 'error' : 'default'" :messages="errors.image ? { error: errors.image } : {}">
-                        <template #label>à¦›à¦¬à¦¿ à¦ªà§à¦°à¦¦à¦¾à¦¨ à¦•à¦°à§à¦¨ (à¦à¦šà§à¦›à¦¿à¦•)</template>
+                        <template #label>ছবি প্রদান করুন (ঐচ্ছিক)</template>
                         <cdx-text-input 
                             v-model="form.image" 
-                            placeholder="à¦‰à¦¦à¦¾à¦¹à¦°à¦¨à¦ƒ Example.jpg"
+                            placeholder="উদাহরণ: Example.jpg"
                         />
                     </cdx-field>
 
                     <cdx-field>
-                        <template #label>à¦›à¦¬à¦¿à¦° à¦¶à¦¿à¦°à§‹à¦¨à¦¾à¦®</template>
+                        <template #label>ছবির শিরোনাম</template>
                         <cdx-text-input 
                             v-model="form.caption" 
                             :disabled="!form.image"
-                            placeholder="à¦›à¦¬à¦¿à¦° à¦¸à¦‚à¦•à§à¦·à¦¿à¦ªà§à¦¤ à¦¶à¦¿à¦°à§‹à¦¨à¦¾à¦® à¦¬à¦¾ à¦¬à¦°à§à¦£à¦¨à¦¾ à¦²à¦¿à¦–à§à¦¨..."
+                            placeholder="ছবির সংক্ষিপ্ত শিরোনাম বা বর্ণনা লিখুন..."
                         />
                     </cdx-field>
 
                     <div class="dyk-hooks-section">
                         <div class="dyk-hooks-header">
-                            <label>à¦­à§à¦•à§à¦¤à¦¿ (Hooks)</label>
+                            <label>ভুক্তি (Hooks)</label>
                             <span :style="{ color: remainingChars < 0 ? 'red' : '#555' }">
-                                {{ bDigits(remainingChars) }} à¦…à¦•à§à¦·à¦° à¦…à¦¬à¦¶à¦¿à¦·à§à¦Ÿ
+                                {{ bDigits(remainingChars) }} অক্ষর অবশিষ্ট
                             </span>
                         </div>
                         
                         <cdx-text-area
                             v-model="form.mainHook"
-                            placeholder="à¦®à§‚à¦² à¦­à§à¦•à§à¦¤à¦¿ à¦²à¦¿à¦–à§à¦¨..."
+                            placeholder="মূল ভুক্তি লিখুন..."
                             rows="2"
                         />
 
                         <div v-for="(hook, index) in form.altHooks" :key="index" class="dyk-alt-hook">
                             <cdx-text-area
                                 v-model="form.altHooks[index]"
-                                :placeholder="'à¦¬à¦¿à¦•à¦²à§à¦ª à¦­à§à¦•à§à¦¤à¦¿ ' + bDigits(index + 1) + ' à¦²à¦¿à¦–à§à¦¨...'"
+                                :placeholder="'বিকল্প ভুক্তি ' + bDigits(index + 1) + ' লিখুন...'"
                                 rows="1"
                             />
                             <cdx-button action="destructive" weight="quiet" @click="removeAltHook(index)">
-                                à¦®à§à¦›à§‡ à¦«à§‡à¦²à§à¦¨
+                                মুছে ফেলুন
                             </cdx-button>
                         </div>
 
@@ -111,23 +111,23 @@ window.DYKUI = (function(Vue, Cdx) {
                             style="margin-top: 8px;"
                             :disabled="!form.mainHook"
                         >
-                            à¦¬à¦¿à¦•à¦²à§à¦ª à¦­à§à¦•à§à¦¤à¦¿ à¦¯à§‹à¦— à¦•à¦°à§à¦¨
+                            বিকল্প ভুক্তি যোগ করুন
                         </cdx-button>
                     </div>
 
                     <div v-if="loading" class="dyk-loading">
                         <cdx-progress-bar />
-                        <p>à¦…à¦¨à§à¦—à§à¦°à¦¹ à¦•à¦°à§‡ à¦…à¦ªà§‡à¦•à§à¦·à¦¾ à¦•à¦°à§à¦¨...</p>
+                        <p>অনুগ্রহ করে অপেক্ষা করুন...</p>
                     </div>
 
                     <div v-if="previewHtml" class="dyk-preview mw-parser-output" v-html="previewHtml"></div>
                     
                     <div style="margin-top: 16px; display: flex; gap: 8px;">
                         <cdx-button @click="handlePreview" :disabled="loading || !form.article || !form.mainHook">
-                            à¦ªà§à¦°à¦¾à¦•à¦¦à¦°à§à¦¶à¦¨
+                            প্রাকদর্শন
                         </cdx-button>
                         <cdx-button @click="openMainPage">
-                            à¦¨à¦¿à¦°à§à¦¦à§‡à¦¶à¦¿à¦•à¦¾
+                            নির্দেশিকা
                         </cdx-button>
                     </div>
                 </div>
@@ -141,12 +141,12 @@ window.DYKUI = (function(Vue, Cdx) {
             const loading = ref(false);
             const previewHtml = ref('');
             const suggestions = ref([]);
-            const title = "à¦†à¦œà¦¾à¦•à¦¿ à¦®à¦¨à§‹à¦¨à¦¯à¦¼à¦¨ (Codex)";
+            const title = "আজাকি মনোনয়ন (Codex)";
 
             const form = reactive({
                 article: '',
                 nominator: mw.config.get('wgUserName') || '',
-                status: 'à¦¨à¦¤à§à¦¨',
+                status: 'নতুন',
                 image: '',
                 caption: '',
                 mainHook: '',
@@ -160,8 +160,8 @@ window.DYKUI = (function(Vue, Cdx) {
             });
 
             const statusOptions = [
-                { value: 'à¦¨à¦¤à§à¦¨', label: 'à¦¨à¦¤à§à¦¨' },
-                { value: 'à¦¬à¦°à§à¦§à¦¿à¦¤', label: 'à¦¬à¦°à§à¦§à¦¿à¦¤' }
+                { value: 'নতুন', label: 'নতুন' },
+                { value: 'বর্ধিত', label: 'বর্ধিত' }
             ];
 
             const bDigits = DYKCore.toBengaliDigits;
@@ -174,12 +174,12 @@ window.DYKUI = (function(Vue, Cdx) {
             });
 
             const primaryAction = {
-                label: 'à¦œà¦®à¦¾ à¦¦à¦¿à¦¨',
+                label: 'জমা দিন',
                 actionType: 'progressive'
             };
 
             const secondaryAction = {
-                label: 'à¦¬à¦¨à§à¦§ à¦•à¦°à§à¦¨'
+                label: 'বন্ধ করুন'
             };
 
             function open() {
@@ -233,7 +233,7 @@ window.DYKUI = (function(Vue, Cdx) {
                 errors.image = '';
                 
                 if (!form.article.trim()) {
-                    errors.article = 'à¦¨à¦¿à¦¬à¦¨à§à¦§à§‡à¦° à¦¨à¦¾à¦® à¦ªà§à¦°à¦¯à§‹à¦œà¦¨à§€à¦¯à¦¼';
+                    errors.article = 'নিবন্ধের নাম প্রয়োজনীয়';
                     valid = false;
                 }
                 
@@ -244,7 +244,7 @@ window.DYKUI = (function(Vue, Cdx) {
                 if (form.image.trim()) {
                     const ext = form.image.split('.').pop().toLowerCase();
                     if (!['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) {
-                        errors.image = 'à¦…à¦¬à§ˆà¦§ à¦›à¦¬à¦¿à¦° à¦«à¦°à¦®à§à¦¯à¦¾à¦Ÿ';
+                        errors.image = 'অবৈধ ছবির ফরম্যাট';
                         valid = false;
                     }
                 }
@@ -261,7 +261,7 @@ window.DYKUI = (function(Vue, Cdx) {
                         ...form,
                         articleCreator: creator
                     });
-                    const html = await DYKCore.getPreview(wikitext, 'à¦Ÿà§‡à¦®à¦ªà§à¦²à§‡à¦Ÿ à¦†à¦²à§‹à¦šà¦¨à¦¾:à¦†à¦ªà¦¨à¦¿ à¦œà¦¾à¦¨à§‡à¦¨ à¦•à¦¿');
+                    const html = await DYKCore.getPreview(wikitext, 'টেমপ্লেট আলোচনা:আপনি জানেন কি');
                     previewHtml.value = html;
                     
                     // Wait for DOM to update then fix images
@@ -270,7 +270,7 @@ window.DYKUI = (function(Vue, Cdx) {
                         DYKCore.fixLazyImages($preview);
                     });
                 } catch (e) {
-                    previewHtml.value = `<div style="color:red">à¦ªà§à¦°à¦¾à¦•à¦¦à¦°à§à¦¶à¦¨ à¦²à§‹à¦¡ à¦•à¦°à¦¤à§‡ à¦¬à§à¦¯à¦°à§à¦¥: ${e.message}</div>`;
+                    previewHtml.value = `<div style="color:red">প্রাকদর্শন লোড করতে ব্যর্থ: ${e.message}</div>`;
                 } finally {
                     loading.value = false;
                 }
@@ -286,24 +286,24 @@ window.DYKUI = (function(Vue, Cdx) {
                         articleCreator: creator
                     });
                     await DYKCore.postNomination(
-                        'à¦Ÿà§‡à¦®à¦ªà§à¦²à§‡à¦Ÿ à¦†à¦²à§‹à¦šà¦¨à¦¾:à¦†à¦ªà¦¨à¦¿ à¦œà¦¾à¦¨à§‡à¦¨ à¦•à¦¿',
+                        'টেমপ্লেট আলোচনা:আপনি জানেন কি',
                         wikitext,
-                        'à¦†à¦œà¦¾à¦•à¦¿ à¦®à¦¨à§‹à¦¨à¦¯à¦¼à¦¨ à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡ (Codex)'
+                        'আজাকি মনোনয়ন যোগ করা হয়েছে (Codex)'
                     );
-                    mw.notify('à¦¸à¦«à¦²à¦­à¦¾à¦¬à§‡ à¦†à¦œà¦¾à¦•à¦¿ à¦®à¦¨à§‹à¦¨à¦¯à¦¼à¦¨ à¦¯à§à¦•à§à¦•à§à¦¤ à¦¹à¦¯à¦¼à§‡à¦›à§‡!');
+                    mw.notify('সফলভাবে আজাকি মনোনয়ন যুক্ত হয়েছে!');
                     close();
-                    if (mw.config.get('wgPageName') === 'à¦Ÿà§‡à¦®à¦ªà§à¦²à§‡à¦Ÿ_à¦†à¦²à§‹à¦šà¦¨à¦¾:à¦†à¦ªà¦¨à¦¿_à¦œà¦¾à¦¨à§‡à¦¨_à¦•à¦¿') {
+                    if (mw.config.get('wgPageName') === 'টেমপ্লেট_আলোচনা:আপনি_জানেন_কি') {
                         location.reload();
                     }
                 } catch (e) {
-                    mw.notify('à¦¸à¦®à§à¦ªà¦¾à¦¦à¦¨à¦¾ à¦¸à¦‚à¦°à¦•à§à¦·à¦£à§‡ à¦¸à¦®à¦¸à§à¦¯à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡: ' + e.message, { type: 'error' });
+                    mw.notify('সম্পাদনা সংরক্ষণে সমস্যা হয়েছে: ' + e.message, { type: 'error' });
                 } finally {
                     loading.value = false;
                 }
             }
 
             function openMainPage() {
-                window.open(mw.util.getUrl('à¦‰à¦‡à¦•à¦¿à¦ªà¦¿à¦¡à¦¿à¦¯à¦¼à¦¾:à¦†à¦ªà¦¨à¦¿ à¦œà¦¾à¦¨à§‡à¦¨ à¦•à¦¿'), '_blank');
+                window.open(mw.util.getUrl('উইকিপিডিয়া:আপনি জানেন কি'), '_blank');
             }
 
             return {

@@ -81,7 +81,7 @@ window.DYKCore = (function($) {
             });
             const page = response.query.pages[0];
             if (page.missing) {
-                throw new Error(`Page not found: ${title}`);
+                throw new Error(`à¦¨à¦¿à¦¬à¦¨à§à¦§à¦Ÿà¦¿ à¦ªà¦¾à¦“à¦¯à¦¼à¦¾ à¦¯à¦¾à¦¯à¦¼à¦¨à¦¿: ${title}`);
             }
             return page.revisions[0].user;
         } catch (error) {
@@ -99,12 +99,12 @@ window.DYKCore = (function($) {
         const { article, mainHook, altHooks = [], image, caption, status, nominator, articleCreator } = data;
         const isSelfNom = nominator === articleCreator;
         const imageTemplate = image.trim() ? `<div style="float:right;margin-left:0.5em;">[[File:${image}|100x100px|${caption}]]</div>` : '';
-        const statusText = status === 'Ã Â¦Â¨Ã Â¦Â¤Ã Â§Ã Â¦Â¨' ? 'Ã Â¦â€¢Ã Â¦Â°Ã Â§Ã Â¦Â¤Ã Â§Æ’Ã Â¦â€¢ Ã Â¦ÂªÃ Â§Ã Â¦Â°Ã Â¦Â£Ã Â§â‚¬Ã Â¦Â¤ Ã Â¦Â¨Ã Â¦Â¤Ã Â§Ã Â¦Â¨ Ã Â¦Â¨Ã Â¦Â¿Ã Â¦Â¬Ã Â¦Â¨Ã Â§Ã Â¦Â§' : 'Ã Â¦Â¦Ã Â§Ã Â¦Â¬Ã Â¦Â¾Ã Â¦Â°Ã Â¦Â¾ Ã Â¦â€°Ã Â¦Â²Ã Â§Ã Â¦Â²Ã Â§â€¡Ã Â¦â€“Ã Â¦Â¯Ã Â§â€¹Ã Â¦â€”Ã Â§Ã Â¦Â¯Ã Â¦Â­Ã Â¦Â¾Ã Â¦Â¬Ã Â§â€¡ Ã Â¦Â¬Ã Â¦Â°Ã Â§Ã Â¦Â§Ã Â¦Â¿Ã Â¦Â¤ Ã Â¦Â¨Ã Â¦Â¿Ã Â¦Â¬Ã Â¦Â¨Ã Â§Ã Â¦Â§;';
-        const nominatorText = isSelfNom ? 'Ã Â¦Â¸Ã Â§Ã Â¦Â¬Ã Â¦Â®Ã Â¦Â¨Ã Â§â€¹Ã Â¦Â¨Ã Â§â‚¬Ã Â¦Â¤;' : `Ã Â¦Â®Ã Â¦Â¨Ã Â§â€¹Ã Â¦Â¨Ã Â¦Â¯Ã Â¦Â¼Ã Â¦Â¨ Ã Â¦â€¢Ã Â¦Â°Ã Â§â€¡Ã Â¦â€ºÃ Â§â€¡Ã Â¦Â¨ [[Ã Â¦Â¬Ã Â§Ã Â¦Â¯Ã Â¦Â¬Ã Â¦Â¹Ã Â¦Â¾Ã Â¦Â°Ã Â¦â€¢Ã Â¦Â¾Ã Â¦Â°Ã Â§â‚¬:${nominator}|${nominator}]] ([[Ã Â¦Â¬Ã Â§Ã Â¦Â¯Ã Â¦Â¬Ã Â¦Â¹Ã Â¦Â¾Ã Â¦Â°Ã Â¦â€¢Ã Â¦Â¾Ã Â¦Â°Ã Â§â‚¬ Ã Â¦â€ Ã Â¦Â²Ã Â¦Â¾Ã Â¦Âª:${nominator}|Ã Â¦â€ Ã Â¦Â²Ã Â¦Â¾Ã Â¦Âª]])`;
+        const statusText = status === 'à¦¨à¦¤à§à¦¨' ? 'à¦•à¦°à§à¦¤à§ƒà¦• à¦ªà§à¦°à¦£à§€à¦¤ à¦¨à¦¤à§à¦¨ à¦¨à¦¿à¦¬à¦¨à§à¦§' : 'à¦¦à§à¦¬à¦¾à¦°à¦¾ à¦‰à¦²à§à¦²à§‡à¦–à¦¯à§‹à¦—à§à¦¯à¦­à¦¾à¦¬à§‡ à¦¬à¦°à§à¦§à¦¿à¦¤ à¦¨à¦¿à¦¬à¦¨à§à¦§;';
+        const nominatorText = isSelfNom ? 'à¦¸à§à¦¬à¦®à¦¨à§‹à¦¨à§€à¦¤;' : `à¦®à¦¨à§‹à¦¨à¦¯à¦¼à¦¨ à¦•à¦°à§‡à¦›à§‡à¦¨ [[à¦¬à§à¦¯à¦¬à¦¹à¦¾à¦°à¦•à¦¾à¦°à§€:${nominator}|${nominator}]] ([[à¦¬à§à¦¯à¦¬à¦¹à¦¾à¦°à¦•à¦¾à¦°à§€ à¦†à¦²à¦¾à¦ª:${nominator}|à¦†à¦²à¦¾à¦ª]])`;
         
-        const hooksText = [`*...${mainHook}?`, ...altHooks.map((h, i) => `${'*'.repeat(i + 2)}'''Ã Â¦Â¬Ã Â¦Â¿Ã Â¦â€¢Ã Â¦Â²Ã Â§Ã Â¦Âª:''' ...${h}?`)].join('\n');
+        const hooksText = [`*...${mainHook}?`, ...altHooks.map((h, i) => `${'*'.repeat(i + 2)}'''à¦¬à¦¿à¦•à¦²à§à¦ª:''' ...${h}?`)].join('\n');
         
-        const footer = `-- Ã Â¦Â¬Ã Â§Ã Â¦Â¯Ã Â¦Â¬Ã Â¦Â¹Ã Â¦Â¾Ã Â¦Â°Ã Â¦â€¢Ã Â¦Â¾Ã Â¦Â°Ã Â§â‚¬ [[Ã Â¦Â¬Ã Â§Ã Â¦Â¯Ã Â¦Â¬Ã Â¦Â¹Ã Â¦Â¾Ã Â¦Â°Ã Â¦â€¢Ã Â¦Â¾Ã Â¦Â°Ã Â§â‚¬:${articleCreator}|${articleCreator}]] ([[Ã Â¦Â¬Ã Â§Ã Â¦Â¯Ã Â¦Â¬Ã Â¦Â¹Ã Â¦Â¾Ã Â¦Â°Ã Â¦â€¢Ã Â¦Â¾Ã Â¦Â°Ã Â§â‚¬ Ã Â¦â€ Ã Â¦Â²Ã Â¦Â¾Ã Â¦Âª:${articleCreator}|Ã Â¦â€ Ã Â¦Â²Ã Â¦Â¾Ã Â¦Âª]]) ${statusText} Ã Â¦â€œ ${nominatorText} ~~~~~`;
+        const footer = `-- à¦¬à§à¦¯à¦¬à¦¹à¦¾à¦°à¦•à¦¾à¦°à§€ [[à¦¬à§à¦¯à¦¬à¦¹à¦¾à¦°à¦•à¦¾à¦°à§€:${articleCreator}|${articleCreator}]] ([[à¦¬à§à¦¯à¦¬à¦¹à¦¾à¦°à¦•à¦¾à¦°à§€ à¦†à¦²à¦¾à¦ª:${articleCreator}|à¦†à¦²à¦¾à¦ª]]) ${statusText} à¦“ ${nominatorText} ~~~~~`;
 
         return `== ${article} ==\n${imageTemplate}\n\n${hooksText}\n\n${footer}`;
     }
@@ -127,7 +127,7 @@ window.DYKCore = (function($) {
             });
             const page = queryResponse.query.pages[0];
             if (!page || page.missing) {
-                throw new Error(`Page not found: ${pageTitle}`);
+                throw new Error(`à¦ªà¦¾à¦¤à¦¾à¦Ÿà¦¿ à¦ªà¦¾à¦“à¦¯à¦¼à¦¾ à¦¯à¦¾à¦¯à¦¼à¦¨à¦¿: ${pageTitle}`);
             }
             const currentContent = page.revisions[0].content || '';
             
@@ -172,7 +172,7 @@ window.DYKCore = (function($) {
      * @returns {string}
      */
     function toBengaliDigits(num) {
-        return num.toString().replace(/\d/g, d => 'Ã Â§Â¦Ã Â§Â§Ã Â§Â¨Ã Â§Â©Ã Â§ÂªÃ Â§Â«Ã Â§Â¬Ã Â§Â­Ã Â§Â®Ã Â§Â¯'[d]);
+        return num.toString().replace(/\d/g, d => 'à§¦à§§à§¨à§©à§ªà§«à§¬à§­à§®à§¯'[d]);
     }
 
     return {
@@ -222,10 +222,10 @@ window.DYKUI = (function(Vue, Cdx) {
             >
                 <div class="dyk-form">
                     <cdx-field :status="errors.article ? 'error' : 'default'" :messages="errors.article ? { error: errors.article } : {}">
-                        <template #label>Ã Â¦Â¨Ã Â¦Â¿Ã Â¦Â¬Ã Â¦Â¨Ã Â§Ã Â¦Â§Ã Â§â€¡Ã Â¦Â° Ã Â¦Â¨Ã Â¦Â¾Ã Â¦Â®</template>
+                        <template #label>à¦¨à¦¿à¦¬à¦¨à§à¦§à§‡à¦° à¦¨à¦¾à¦®</template>
                         <cdx-text-input 
                             v-model="form.article" 
-                            placeholder="Ã Â¦Â¨Ã Â¦Â¿Ã Â¦Â¬Ã Â¦Â¨Ã Â§Ã Â¦Â§Ã Â§â€¡Ã Â¦Â° Ã Â¦Â¨Ã Â¦Â¾Ã Â¦Â® Ã Â¦ÂªÃ Â§Ã Â¦Â°Ã Â¦Â¦Ã Â¦Â¾Ã Â¦Â¨ Ã Â¦â€¢Ã Â¦Â°Ã Â§Ã Â¦Â¨..."
+                            placeholder="à¦¨à¦¿à¦¬à¦¨à§à¦§à§‡à¦° à¦¨à¦¾à¦® à¦ªà§à¦°à¦¦à¦¾à¦¨ à¦•à¦°à§à¦¨..."
                             @input="handleArticleInput"
                         />
                         <div v-if="suggestions.length" class="dyk-suggestions">
@@ -241,12 +241,12 @@ window.DYKUI = (function(Vue, Cdx) {
                     </cdx-field>
 
                     <cdx-field>
-                        <template #label>Ã Â¦Â®Ã Â¦Â¨Ã Â§â€¹Ã Â¦Â¨Ã Â¦Â¯Ã Â¦Â¼Ã Â¦Â¨Ã Â¦â€¢Ã Â¦Â¾Ã Â¦Â°Ã Â§â‚¬Ã Â¦Â° Ã Â¦Â¨Ã Â¦Â¾Ã Â¦Â®</template>
+                        <template #label>à¦®à¦¨à§‹à¦¨à¦¯à¦¼à¦¨à¦•à¦¾à¦°à§€à¦° à¦¨à¦¾à¦®</template>
                         <cdx-text-input :value="form.nominator" disabled />
                     </cdx-field>
 
                     <cdx-field>
-                        <template #label>Ã Â¦Â¨Ã Â¦Â¿Ã Â¦Â¬Ã Â¦Â¨Ã Â§Ã Â¦Â§Ã Â§â€¡Ã Â¦Â° Ã Â¦â€¦Ã Â¦Â¬Ã Â¦Â¸Ã Â§Ã Â¦Â¥Ã Â¦Â¾</template>
+                        <template #label>à¦¨à¦¿à¦¬à¦¨à§à¦§à§‡à¦° à¦…à¦¬à¦¸à§à¦¥à¦¾</template>
                         <cdx-select
                             v-model:selected="form.status"
                             :menu-items="statusOptions"
@@ -254,44 +254,44 @@ window.DYKUI = (function(Vue, Cdx) {
                     </cdx-field>
 
                     <cdx-field :status="errors.image ? 'error' : 'default'" :messages="errors.image ? { error: errors.image } : {}">
-                        <template #label>Ã Â¦â€ºÃ Â¦Â¬Ã Â¦Â¿ Ã Â¦ÂªÃ Â§Ã Â¦Â°Ã Â¦Â¦Ã Â¦Â¾Ã Â¦Â¨ Ã Â¦â€¢Ã Â¦Â°Ã Â§Ã Â¦Â¨ (Ã Â¦Ã Â¦Å¡Ã Â§Ã Â¦â€ºÃ Â¦Â¿Ã Â¦â€¢)</template>
+                        <template #label>à¦›à¦¬à¦¿ à¦ªà§à¦°à¦¦à¦¾à¦¨ à¦•à¦°à§à¦¨ (à¦à¦šà§à¦›à¦¿à¦•)</template>
                         <cdx-text-input 
                             v-model="form.image" 
-                            placeholder="Ã Â¦â€°Ã Â¦Â¦Ã Â¦Â¾Ã Â¦Â¹Ã Â¦Â°Ã Â¦Â¨Ã Â¦Æ’ Example.jpg"
+                            placeholder="à¦‰à¦¦à¦¾à¦¹à¦°à¦£: Example.jpg"
                         />
                     </cdx-field>
 
                     <cdx-field>
-                        <template #label>Ã Â¦â€ºÃ Â¦Â¬Ã Â¦Â¿Ã Â¦Â° Ã Â¦Â¶Ã Â¦Â¿Ã Â¦Â°Ã Â§â€¹Ã Â¦Â¨Ã Â¦Â¾Ã Â¦Â®</template>
+                        <template #label>à¦›à¦¬à¦¿à¦° à¦¶à¦¿à¦°à§‹à¦¨à¦¾à¦®</template>
                         <cdx-text-input 
                             v-model="form.caption" 
                             :disabled="!form.image"
-                            placeholder="Ã Â¦â€ºÃ Â¦Â¬Ã Â¦Â¿Ã Â¦Â° Ã Â¦Â¸Ã Â¦â€šÃ Â¦â€¢Ã Â§Ã Â¦Â·Ã Â¦Â¿Ã Â¦ÂªÃ Â§Ã Â¦Â¤ Ã Â¦Â¶Ã Â¦Â¿Ã Â¦Â°Ã Â§â€¹Ã Â¦Â¨Ã Â¦Â¾Ã Â¦Â® Ã Â¦Â¬Ã Â¦Â¾ Ã Â¦Â¬Ã Â¦Â°Ã Â§Ã Â¦Â£Ã Â¦Â¨Ã Â¦Â¾ Ã Â¦Â²Ã Â¦Â¿Ã Â¦â€“Ã Â§Ã Â¦Â¨..."
+                            placeholder="à¦›à¦¬à¦¿à¦° à¦¸à¦‚à¦•à§à¦·à¦¿à¦ªà§à¦¤ à¦¶à¦¿à¦°à§‹à¦¨à¦¾à¦® à¦¬à¦¾ à¦¬à¦°à§à¦£à¦¨à¦¾ à¦²à¦¿à¦–à§à¦¨..."
                         />
                     </cdx-field>
 
                     <div class="dyk-hooks-section">
                         <div class="dyk-hooks-header">
-                            <label>Ã Â¦Â­Ã Â§Ã Â¦â€¢Ã Â§Ã Â¦Â¤Ã Â¦Â¿ (Hooks)</label>
+                            <label>à¦­à§à¦•à§à¦¤à¦¿ (Hooks)</label>
                             <span :style="{ color: remainingChars < 0 ? 'red' : '#555' }">
-                                {{ bDigits(remainingChars) }} Ã Â¦â€¦Ã Â¦â€¢Ã Â§Ã Â¦Â·Ã Â¦Â° Ã Â¦â€¦Ã Â¦Â¬Ã Â¦Â¶Ã Â¦Â¿Ã Â¦Â·Ã Â§Ã Â¦Å¸
+                                {{ bDigits(remainingChars) }} à¦…à¦•à§à¦·à¦° à¦…à¦¬à¦¶à¦¿à¦·à§à¦Ÿ
                             </span>
                         </div>
                         
                         <cdx-text-area
                             v-model="form.mainHook"
-                            placeholder="Ã Â¦Â®Ã Â§â€šÃ Â¦Â² Ã Â¦Â­Ã Â§Ã Â¦â€¢Ã Â§Ã Â¦Â¤Ã Â¦Â¿ Ã Â¦Â²Ã Â¦Â¿Ã Â¦â€“Ã Â§Ã Â¦Â¨..."
+                            placeholder="à¦®à§‚à¦² à¦­à§à¦•à§à¦¤à¦¿ à¦²à¦¿à¦–à§à¦¨..."
                             rows="2"
                         />
 
                         <div v-for="(hook, index) in form.altHooks" :key="index" class="dyk-alt-hook">
                             <cdx-text-area
                                 v-model="form.altHooks[index]"
-                                :placeholder="'Ã Â¦Â¬Ã Â¦Â¿Ã Â¦â€¢Ã Â¦Â²Ã Â§Ã Â¦Âª Ã Â¦Â­Ã Â§Ã Â¦â€¢Ã Â§Ã Â¦Â¤Ã Â¦Â¿ ' + bDigits(index + 1) + ' Ã Â¦Â²Ã Â¦Â¿Ã Â¦â€“Ã Â§Ã Â¦Â¨...'"
+                                :placeholder="'à¦¬à¦¿à¦•à¦²à§à¦ª à¦­à§à¦•à§à¦¤à¦¿ ' + bDigits(index + 1) + ' à¦²à¦¿à¦–à§à¦¨...'"
                                 rows="1"
                             />
                             <cdx-button action="destructive" weight="quiet" @click="removeAltHook(index)">
-                                Ã Â¦Â®Ã Â§Ã Â¦â€ºÃ Â§â€¡ Ã Â¦Â«Ã Â§â€¡Ã Â¦Â²Ã Â§Ã Â¦Â¨
+                                à¦®à§à¦›à§‡ à¦«à§‡à¦²à§à¦¨
                             </cdx-button>
                         </div>
 
@@ -301,23 +301,23 @@ window.DYKUI = (function(Vue, Cdx) {
                             style="margin-top: 8px;"
                             :disabled="!form.mainHook"
                         >
-                            Ã Â¦Â¬Ã Â¦Â¿Ã Â¦â€¢Ã Â¦Â²Ã Â§Ã Â¦Âª Ã Â¦Â­Ã Â§Ã Â¦â€¢Ã Â§Ã Â¦Â¤Ã Â¦Â¿ Ã Â¦Â¯Ã Â§â€¹Ã Â¦â€” Ã Â¦â€¢Ã Â¦Â°Ã Â§Ã Â¦Â¨
+                            à¦¬à¦¿à¦•à¦²à§à¦ª à¦­à§à¦•à§à¦¤à¦¿ à¦¯à§‹à¦— à¦•à¦°à§à¦¨
                         </cdx-button>
                     </div>
 
                     <div v-if="loading" class="dyk-loading">
                         <cdx-progress-bar />
-                        <p>Ã Â¦â€¦Ã Â¦Â¨Ã Â§Ã Â¦â€”Ã Â§Ã Â¦Â°Ã Â¦Â¹ Ã Â¦â€¢Ã Â¦Â°Ã Â§â€¡ Ã Â¦â€¦Ã Â¦ÂªÃ Â§â€¡Ã Â¦â€¢Ã Â§Ã Â¦Â·Ã Â¦Â¾ Ã Â¦â€¢Ã Â¦Â°Ã Â§Ã Â¦Â¨...</p>
+                        <p>à¦…à¦¨à§à¦—à§à¦°à¦¹ à¦•à¦°à§‡ à¦…à¦ªà§‡à¦•à§à¦·à¦¾ à¦•à¦°à§à¦¨...</p>
                     </div>
 
                     <div v-if="previewHtml" class="dyk-preview mw-parser-output" v-html="previewHtml"></div>
                     
                     <div style="margin-top: 16px; display: flex; gap: 8px;">
                         <cdx-button @click="handlePreview" :disabled="loading || !form.article || !form.mainHook">
-                            Ã Â¦ÂªÃ Â§Ã Â¦Â°Ã Â¦Â¾Ã Â¦â€¢Ã Â¦Â¦Ã Â¦Â°Ã Â§Ã Â¦Â¶Ã Â¦Â¨
+                            à¦ªà§à¦°à¦¾à¦•à¦¦à¦°à§à¦¶à¦¨
                         </cdx-button>
                         <cdx-button @click="openMainPage">
-                            Ã Â¦Â¨Ã Â¦Â¿Ã Â¦Â°Ã Â§Ã Â¦Â¦Ã Â§â€¡Ã Â¦Â¶Ã Â¦Â¿Ã Â¦â€¢Ã Â¦Â¾
+                            à¦¨à¦¿à¦°à§à¦¦à§‡à¦¶à¦¿à¦•à¦¾
                         </cdx-button>
                     </div>
                 </div>
@@ -331,12 +331,12 @@ window.DYKUI = (function(Vue, Cdx) {
             const loading = ref(false);
             const previewHtml = ref('');
             const suggestions = ref([]);
-            const title = "Ã Â¦â€ Ã Â¦Å“Ã Â¦Â¾Ã Â¦â€¢Ã Â¦Â¿ Ã Â¦Â®Ã Â¦Â¨Ã Â§â€¹Ã Â¦Â¨Ã Â¦Â¯Ã Â¦Â¼Ã Â¦Â¨ (Codex)";
+            const title = "à¦†à¦œà¦¾à¦•à¦¿ à¦®à¦¨à§‹à¦¨à¦¯à¦¼à¦¨ (Codex)";
 
             const form = reactive({
                 article: '',
                 nominator: mw.config.get('wgUserName') || '',
-                status: 'Ã Â¦Â¨Ã Â¦Â¤Ã Â§Ã Â¦Â¨',
+                status: 'à¦¨à¦¤à§à¦¨',
                 image: '',
                 caption: '',
                 mainHook: '',
@@ -350,8 +350,8 @@ window.DYKUI = (function(Vue, Cdx) {
             });
 
             const statusOptions = [
-                { value: 'Ã Â¦Â¨Ã Â¦Â¤Ã Â§Ã Â¦Â¨', label: 'Ã Â¦Â¨Ã Â¦Â¤Ã Â§Ã Â¦Â¨' },
-                { value: 'Ã Â¦Â¬Ã Â¦Â°Ã Â§Ã Â¦Â§Ã Â¦Â¿Ã Â¦Â¤', label: 'Ã Â¦Â¬Ã Â¦Â°Ã Â§Ã Â¦Â§Ã Â¦Â¿Ã Â¦Â¤' }
+                { value: 'à¦¨à¦¤à§à¦¨', label: 'à¦¨à¦¤à§à¦¨' },
+                { value: 'à¦¬à¦°à§à¦§à¦¿à¦¤', label: 'à¦¬à¦°à§à¦§à¦¿à¦¤' }
             ];
 
             const bDigits = DYKCore.toBengaliDigits;
@@ -364,12 +364,12 @@ window.DYKUI = (function(Vue, Cdx) {
             });
 
             const primaryAction = {
-                label: 'Ã Â¦Å“Ã Â¦Â®Ã Â¦Â¾ Ã Â¦Â¦Ã Â¦Â¿Ã Â¦Â¨',
+                label: 'à¦œà¦®à¦¾ à¦¦à¦¿à¦¨',
                 actionType: 'progressive'
             };
 
             const secondaryAction = {
-                label: 'Ã Â¦Â¬Ã Â¦Â¨Ã Â§Ã Â¦Â§ Ã Â¦â€¢Ã Â¦Â°Ã Â§Ã Â¦Â¨'
+                label: 'à¦¬à¦¨à§à¦§ à¦•à¦°à§à¦¨'
             };
 
             function open() {
@@ -423,7 +423,7 @@ window.DYKUI = (function(Vue, Cdx) {
                 errors.image = '';
                 
                 if (!form.article.trim()) {
-                    errors.article = 'Ã Â¦Â¨Ã Â¦Â¿Ã Â¦Â¬Ã Â¦Â¨Ã Â§Ã Â¦Â§Ã Â§â€¡Ã Â¦Â° Ã Â¦Â¨Ã Â¦Â¾Ã Â¦Â® Ã Â¦ÂªÃ Â§Ã Â¦Â°Ã Â¦Â¯Ã Â§â€¹Ã Â¦Å“Ã Â¦Â¨Ã Â§â‚¬Ã Â¦Â¯Ã Â¦Â¼';
+                    errors.article = 'à¦¨à¦¿à¦¬à¦¨à§à¦§à§‡à¦° à¦¨à¦¾à¦® à¦ªà§à¦°à¦¯à¦¼à§‹à¦œà¦¨à§€à¦¯à¦¼';
                     valid = false;
                 }
                 
@@ -434,7 +434,7 @@ window.DYKUI = (function(Vue, Cdx) {
                 if (form.image.trim()) {
                     const ext = form.image.split('.').pop().toLowerCase();
                     if (!['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) {
-                        errors.image = 'Ã Â¦â€¦Ã Â¦Â¬Ã Â§Ë†Ã Â¦Â§ Ã Â¦â€ºÃ Â¦Â¬Ã Â¦Â¿Ã Â¦Â° Ã Â¦Â«Ã Â¦Â°Ã Â¦Â®Ã Â§Ã Â¦Â¯Ã Â¦Â¾Ã Â¦Å¸';
+                        errors.image = 'à¦…à¦¬à§ˆà¦§ à¦›à¦¬à¦¿à¦° à¦«à¦°à¦®à§à¦¯à¦¾à¦Ÿ';
                         valid = false;
                     }
                 }
@@ -451,7 +451,7 @@ window.DYKUI = (function(Vue, Cdx) {
                         ...form,
                         articleCreator: creator
                     });
-                    const html = await DYKCore.getPreview(wikitext, 'Ã Â¦Å¸Ã Â§â€¡Ã Â¦Â®Ã Â¦ÂªÃ Â§Ã Â¦Â²Ã Â§â€¡Ã Â¦Å¸ Ã Â¦â€ Ã Â¦Â²Ã Â§â€¹Ã Â¦Å¡Ã Â¦Â¨Ã Â¦Â¾:Ã Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¿ Ã Â¦Å“Ã Â¦Â¾Ã Â¦Â¨Ã Â§â€¡Ã Â¦Â¨ Ã Â¦â€¢Ã Â¦Â¿');
+                    const html = await DYKCore.getPreview(wikitext, 'à¦Ÿà§‡à¦®à¦ªà§à¦²à§‡à¦Ÿ à¦†à¦²à§‹à¦šà¦¨à¦¾:à¦†à¦ªà¦¨à¦¿ à¦œà¦¾à¦¨à§‡à¦¨ à¦•à¦¿');
                     previewHtml.value = html;
                     
                     // Wait for DOM to update then fix images
@@ -460,7 +460,7 @@ window.DYKUI = (function(Vue, Cdx) {
                         DYKCore.fixLazyImages($preview);
                     });
                 } catch (e) {
-                    previewHtml.value = `<div style="color:red">Ã Â¦ÂªÃ Â§Ã Â¦Â°Ã Â¦Â¾Ã Â¦â€¢Ã Â¦Â¦Ã Â¦Â°Ã Â§Ã Â¦Â¶Ã Â¦Â¨ Ã Â¦Â²Ã Â§â€¹Ã Â¦Â¡ Ã Â¦â€¢Ã Â¦Â°Ã Â¦Â¤Ã Â§â€¡ Ã Â¦Â¬Ã Â§Ã Â¦Â¯Ã Â¦Â°Ã Â§Ã Â¦Â¥: ${e.message}</div>`;
+                    previewHtml.value = `<div style="color:red">à¦ªà§à¦°à¦¾à¦•à¦¦à¦°à§à¦¶à¦¨ à¦²à§‹à¦¡ à¦•à¦°à¦¤à§‡ à¦¬à§à¦¯à¦°à§à¦¥: ${e.message}</div>`;
                 } finally {
                     loading.value = false;
                 }
@@ -476,24 +476,24 @@ window.DYKUI = (function(Vue, Cdx) {
                         articleCreator: creator
                     });
                     await DYKCore.postNomination(
-                        'Ã Â¦Å¸Ã Â§â€¡Ã Â¦Â®Ã Â¦ÂªÃ Â§Ã Â¦Â²Ã Â§â€¡Ã Â¦Å¸ Ã Â¦â€ Ã Â¦Â²Ã Â§â€¹Ã Â¦Å¡Ã Â¦Â¨Ã Â¦Â¾:Ã Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¿ Ã Â¦Å“Ã Â¦Â¾Ã Â¦Â¨Ã Â§â€¡Ã Â¦Â¨ Ã Â¦â€¢Ã Â¦Â¿',
+                        'à¦Ÿà§‡à¦®à¦ªà§à¦²à§‡à¦Ÿ à¦†à¦²à§‹à¦šà¦¨à¦¾:à¦†à¦ªà¦¨à¦¿ à¦œà¦¾à¦¨à§‡à¦¨ à¦•à¦¿',
                         wikitext,
-                        'Ã Â¦â€ Ã Â¦Å“Ã Â¦Â¾Ã Â¦â€¢Ã Â¦Â¿ Ã Â¦Â®Ã Â¦Â¨Ã Â§â€¹Ã Â¦Â¨Ã Â¦Â¯Ã Â¦Â¼Ã Â¦Â¨ Ã Â¦Â¯Ã Â§â€¹Ã Â¦â€” Ã Â¦â€¢Ã Â¦Â°Ã Â¦Â¾ Ã Â¦Â¹Ã Â¦Â¯Ã Â¦Â¼Ã Â§â€¡Ã Â¦â€ºÃ Â§â€¡ (Codex)'
+                        'à¦†à¦œà¦¾à¦•à¦¿ à¦®à¦¨à§‹à¦¨à¦¯à¦¼à¦¨ à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡ (Codex)'
                     );
-                    mw.notify('Ã Â¦Â¸Ã Â¦Â«Ã Â¦Â²Ã Â¦Â­Ã Â¦Â¾Ã Â¦Â¬Ã Â§â€¡ Ã Â¦â€ Ã Â¦Å“Ã Â¦Â¾Ã Â¦â€¢Ã Â¦Â¿ Ã Â¦Â®Ã Â¦Â¨Ã Â§â€¹Ã Â¦Â¨Ã Â¦Â¯Ã Â¦Â¼Ã Â¦Â¨ Ã Â¦Â¯Ã Â§Ã Â¦â€¢Ã Â§Ã Â¦â€¢Ã Â§Ã Â¦Â¤ Ã Â¦Â¹Ã Â¦Â¯Ã Â¦Â¼Ã Â§â€¡Ã Â¦â€ºÃ Â§â€¡!');
+                    mw.notify('à¦¸à¦«à¦²à¦­à¦¾à¦¬à§‡ à¦†à¦œà¦¾à¦•à¦¿ à¦®à¦¨à§‹à¦¨à¦¯à¦¼à¦¨ à¦¯à§à¦•à§à¦¤ à¦¹à¦¯à¦¼à§‡à¦›à§‡!');
                     close();
-                    if (mw.config.get('wgPageName') === 'Ã Â¦Å¸Ã Â§â€¡Ã Â¦Â®Ã Â¦ÂªÃ Â§Ã Â¦Â²Ã Â§â€¡Ã Â¦Å¸_Ã Â¦â€ Ã Â¦Â²Ã Â§â€¹Ã Â¦Å¡Ã Â¦Â¨Ã Â¦Â¾:Ã Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¿_Ã Â¦Å“Ã Â¦Â¾Ã Â¦Â¨Ã Â§â€¡Ã Â¦Â¨_Ã Â¦â€¢Ã Â¦Â¿') {
+                    if (mw.config.get('wgPageName') === 'à¦Ÿà§‡à¦®à¦ªà§à¦²à§‡à¦Ÿ_à¦†à¦²à§‹à¦šà¦¨à¦¾:à¦†à¦ªà¦¨à¦¿_à¦œà¦¾à¦¨à§‡à¦¨_à¦•à¦¿') {
                         location.reload();
                     }
                 } catch (e) {
-                    mw.notify('Ã Â¦Â¸Ã Â¦Â®Ã Â§Ã Â¦ÂªÃ Â¦Â¾Ã Â¦Â¦Ã Â¦Â¨Ã Â¦Â¾ Ã Â¦Â¸Ã Â¦â€šÃ Â¦Â°Ã Â¦â€¢Ã Â§Ã Â¦Â·Ã Â¦Â£Ã Â§â€¡ Ã Â¦Â¸Ã Â¦Â®Ã Â¦Â¸Ã Â§Ã Â¦Â¯Ã Â¦Â¾ Ã Â¦Â¹Ã Â¦Â¯Ã Â¦Â¼Ã Â§â€¡Ã Â¦â€ºÃ Â§â€¡: ' + e.message, { type: 'error' });
+                    mw.notify('à¦¸à¦®à§à¦ªà¦¾à¦¦à¦¨à¦¾ à¦¸à¦‚à¦°à¦•à§à¦·à¦£à§‡ à¦¸à¦®à¦¸à§à¦¯à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡: ' + e.message, { type: 'error' });
                 } finally {
                     loading.value = false;
                 }
             }
 
             function openMainPage() {
-                window.open(mw.util.getUrl('Ã Â¦â€°Ã Â¦â€¡Ã Â¦â€¢Ã Â¦Â¿Ã Â¦ÂªÃ Â¦Â¿Ã Â¦Â¡Ã Â¦Â¿Ã Â¦Â¯Ã Â¦Â¼Ã Â¦Â¾:Ã Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¿ Ã Â¦Å“Ã Â¦Â¾Ã Â¦Â¨Ã Â§â€¡Ã Â¦Â¨ Ã Â¦â€¢Ã Â¦Â¿'), '_blank');
+                window.open(mw.util.getUrl('à¦‰à¦‡à¦•à¦¿à¦ªà¦¿à¦¡à¦¿à¦¯à¦¼à¦¾:à¦†à¦ªà¦¨à¦¿ à¦œà¦¾à¦¨à§‡à¦¨ à¦•à¦¿'), '_blank');
             }
 
             return {
@@ -568,32 +568,8 @@ window.DYKUI = (function(Vue, Cdx) {
         'mediawiki.Title'
     ];
 
-    // In a real GitHub-based setup, these would be the URLs to your hosted files
-    const SCRIPTS = [
-        'dyk-core.js',
-        'dyk-ui.js'
-    ];
-
-    async function loadScripts() {
-        for (const script of SCRIPTS) {
-            // Use local paths for now, or full URLs if on GitHub
-            await $.getScript(mw.config.get('wgExtensionAssetsPath') ? script : `/w/index.php?title=User:R1F4T/${script}&action=raw&ctype=text/javascript`);
-        }
-    }
-
     $(document).ready(() => {
         mw.loader.using(dependencies).then(async () => {
-            // If we are on Wikipedia, we might need to load the other files manually 
-            // if they aren't bundled.
-            // For development, we assume they are already available in the global scope 
-            // if this is a concatenated script, or we load them:
-            
-            if (typeof DYKCore === 'undefined' || typeof DYKUI === 'undefined') {
-                // Try to load them from the user's subpages or a CDN
-                // This part depends on how the user prefers to sync.
-                // For now, let's assume the user will concatenate them or load them via loader.
-            }
-
             const initApp = () => {
                 if (typeof DYKUI !== 'undefined') {
                     DYKUI.show();
@@ -607,9 +583,9 @@ window.DYKUI = (function(Vue, Cdx) {
                 const portletLink = mw.util.addPortletLink(
                     'p-cactions',
                     '#',
-                    'Ã Â¦â€ Ã Â¦Å“Ã Â¦Â¾Ã Â¦â€¢Ã Â¦Â¿ Ã Â¦Â®Ã Â¦Â¨Ã Â§â€¹Ã Â¦Â¨Ã Â¦Â¯Ã Â¦Â¼Ã Â¦Â¨',
+                    'à¦†à¦œà¦¾à¦•à¦¿ à¦®à¦¨à§‹à¦¨à¦¯à¦¼à¦¨',
                     'ca-azaki-dyk',
-                    'Open DYK nomination dialog'
+                    'à¦†à¦œà¦¾à¦•à¦¿ à¦®à¦¨à§‹à¦¨à¦¯à¦¼à¦¨ à¦¡à¦¾à¦¯à¦¼à¦¾à¦²à¦— à¦–à§à¦²à§à¦¨'
                 );
                 $(portletLink).on('click', (e) => {
                     e.preventDefault();
@@ -623,7 +599,7 @@ window.DYKUI = (function(Vue, Cdx) {
             }
             
             // Auto-open on the nomination page if it's a new nomination
-            if (mw.config.get('wgPageName') === 'Ã Â¦Å¸Ã Â§â€¡Ã Â¦Â®Ã Â¦ÂªÃ Â§Ã Â¦Â²Ã Â§â€¡Ã Â¦Å¸_Ã Â¦â€ Ã Â¦Â²Ã Â§â€¹Ã Â¦Å¡Ã Â¦Â¨Ã Â¦Â¾:Ã Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¿_Ã Â¦Å“Ã Â¦Â¾Ã Â¦Â¨Ã Â§â€¡Ã Â¦Â¨_Ã Â¦â€¢Ã Â¦Â¿' && location.search.includes('withJS')) {
+            if (mw.config.get('wgPageName') === 'à¦Ÿà§‡à¦®à¦ªà§à¦²à§‡à¦Ÿ_à¦†à¦²à§‹à¦šà¦¨à¦¾:à¦†à¦ªà¦¨à¦¿_à¦œà¦¾à¦¨à§‡à¦¨_à¦•à¦¿' && location.search.includes('withJS')) {
                 initApp();
             }
         });

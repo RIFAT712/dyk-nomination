@@ -80,7 +80,7 @@ window.DYKCore = (function($) {
             });
             const page = response.query.pages[0];
             if (page.missing) {
-                throw new Error(`Page not found: ${title}`);
+                throw new Error(`নিবন্ধটি পাওয়া যায়নি: ${title}`);
             }
             return page.revisions[0].user;
         } catch (error) {
@@ -98,12 +98,12 @@ window.DYKCore = (function($) {
         const { article, mainHook, altHooks = [], image, caption, status, nominator, articleCreator } = data;
         const isSelfNom = nominator === articleCreator;
         const imageTemplate = image.trim() ? `<div style="float:right;margin-left:0.5em;">[[File:${image}|100x100px|${caption}]]</div>` : '';
-        const statusText = status === 'à¦¨à¦¤à§à¦¨' ? 'à¦•à¦°à§à¦¤à§ƒà¦• à¦ªà§à¦°à¦£à§€à¦¤ à¦¨à¦¤à§à¦¨ à¦¨à¦¿à¦¬à¦¨à§à¦§' : 'à¦¦à§à¦¬à¦¾à¦°à¦¾ à¦‰à¦²à§à¦²à§‡à¦–à¦¯à§‹à¦—à§à¦¯à¦­à¦¾à¦¬à§‡ à¦¬à¦°à§à¦§à¦¿à¦¤ à¦¨à¦¿à¦¬à¦¨à§à¦§;';
-        const nominatorText = isSelfNom ? 'à¦¸à§à¦¬à¦®à¦¨à§‹à¦¨à§€à¦¤;' : `à¦®à¦¨à§‹à¦¨à¦¯à¦¼à¦¨ à¦•à¦°à§‡à¦›à§‡à¦¨ [[à¦¬à§à¦¯à¦¬à¦¹à¦¾à¦°à¦•à¦¾à¦°à§€:${nominator}|${nominator}]] ([[à¦¬à§à¦¯à¦¬à¦¹à¦¾à¦°à¦•à¦¾à¦°à§€ à¦†à¦²à¦¾à¦ª:${nominator}|à¦†à¦²à¦¾à¦ª]])`;
+        const statusText = status === 'নতুন' ? 'কর্তৃক প্রণীত নতুন নিবন্ধ' : 'দ্বারা উল্লেখযোগ্যভাবে বর্ধিত নিবন্ধ;';
+        const nominatorText = isSelfNom ? 'স্বমনোনীত;' : `মনোনয়ন করেছেন [[ব্যবহারকারী:${nominator}|${nominator}]] ([[ব্যবহারকারী আলাপ:${nominator}|আলাপ]])`;
         
-        const hooksText = [`*...${mainHook}?`, ...altHooks.map((h, i) => `${'*'.repeat(i + 2)}'''à¦¬à¦¿à¦•à¦²à§à¦ª:''' ...${h}?`)].join('\n');
+        const hooksText = [`*...${mainHook}?`, ...altHooks.map((h, i) => `${'*'.repeat(i + 2)}'''বিকল্প:''' ...${h}?`)].join('\n');
         
-        const footer = `-- à¦¬à§à¦¯à¦¬à¦¹à¦¾à¦°à¦•à¦¾à¦°à§€ [[à¦¬à§à¦¯à¦¬à¦¹à¦¾à¦°à¦•à¦¾à¦°à§€:${articleCreator}|${articleCreator}]] ([[à¦¬à§à¦¯à¦¬à¦¹à¦¾à¦°à¦•à¦¾à¦°à§€ à¦†à¦²à¦¾à¦ª:${articleCreator}|à¦†à¦²à¦¾à¦ª]]) ${statusText} à¦“ ${nominatorText} ~~~~~`;
+        const footer = `-- ব্যবহারকারী [[ব্যবহারকারী:${articleCreator}|${articleCreator}]] ([[ব্যবহারকারী আলাপ:${articleCreator}|আলাপ]]) ${statusText} ও ${nominatorText} ~~~~~`;
 
         return `== ${article} ==\n${imageTemplate}\n\n${hooksText}\n\n${footer}`;
     }
@@ -126,7 +126,7 @@ window.DYKCore = (function($) {
             });
             const page = queryResponse.query.pages[0];
             if (!page || page.missing) {
-                throw new Error(`Page not found: ${pageTitle}`);
+                throw new Error(`পাতাটি পাওয়া যায়নি: ${pageTitle}`);
             }
             const currentContent = page.revisions[0].content || '';
             
@@ -171,7 +171,7 @@ window.DYKCore = (function($) {
      * @returns {string}
      */
     function toBengaliDigits(num) {
-        return num.toString().replace(/\d/g, d => 'à§¦à§§à§¨à§©à§ªà§«à§¬à§­à§®à§¯'[d]);
+        return num.toString().replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
     }
 
     return {
