@@ -331,7 +331,7 @@ window.DYKUI = (function(Vue, Cdx) {
             const loading = ref(false);
             const previewHtml = ref('');
             const suggestions = ref([]);
-            const title = "আজাকি মনোনয়ন (Codex)";
+            const title = "DYK মনোনয়ন (Codex)";
 
             const form = reactive({
                 article: '',
@@ -478,9 +478,9 @@ window.DYKUI = (function(Vue, Cdx) {
                     await DYKCore.postNomination(
                         'টেমপ্লেট আলোচনা:আপনি জানেন কি',
                         wikitext,
-                        'আজাকি মনোনয়ন যোগ করা হয়েছে (Codex)'
+                        'DYK মনোনয়ন যোগ করা হয়েছে (Codex)'
                     );
-                    mw.notify('সফলভাবে আজাকি মনোনয়ন যুক্ত হয়েছে!');
+                    mw.notify('সফলভাবে DYK মনোনয়ন যুক্ত হয়েছে!');
                     close();
                     if (mw.config.get('wgPageName') === 'টেমপ্লেট_আলোচনা:আপনি_জানেন_কি') {
                         location.reload();
@@ -584,8 +584,8 @@ window.DYKUI = (function(Vue, Cdx) {
                     'p-cactions',
                     '#',
                     'আজাকি মনোনয়ন',
-                    'ca-azaki-dyk',
-                    'আজাকি মনোনয়ন ডায়ালগ খুলুন'
+                    'ca-dyk',
+                    'dyk মনোনয়ন ডায়ালগ খুলুন'
                 );
                 $(portletLink).on('click', (e) => {
                     e.preventDefault();
@@ -594,7 +594,7 @@ window.DYKUI = (function(Vue, Cdx) {
             }
 
             // Also check for a specific parameter to auto-open
-            if (mw.util.getParamValue('azaki-dyk-open') === '1') {
+            if (mw.util.getParamValue('dyk-open') === '1') {
                 initApp();
             }
             

@@ -29,8 +29,8 @@
                     'p-cactions',
                     '#',
                     'আজাকি মনোনয়ন',
-                    'ca-azaki-dyk',
-                    'আজাকি মনোনয়ন ডায়ালগ খুলুন'
+                    'ca-dyk',
+                    'dyk মনোনয়ন ডায়ালগ খুলুন'
                 );
                 $(portletLink).on('click', (e) => {
                     e.preventDefault();
@@ -39,7 +39,7 @@
             }
 
             // Also check for a specific parameter to auto-open
-            if (mw.util.getParamValue('azaki-dyk-open') === '1') {
+            if (mw.util.getParamValue('dyk-open') === '1') {
                 initApp();
             }
             
