@@ -15,9 +15,9 @@ This is a Wikimedia userscript for "Did You Know" (DYK) nominations on Bengali W
 ```javascript
 // Loader
 mw.loader.using(['vue', 'ext.codex.v3', 'mediawiki.api', 'mediawiki.util'], function() {
-    const branch = 'main'; // or your branch name
-    const user = 'YOUR_GITHUB_USERNAME';
-    const repo = 'DYK_Nom';
+    const branch = 'main';
+    const user = 'RIFAT712';
+    const repo = 'dyk-nomination';
     const cdn = `https://cdn.jsdelivr.net/gh/${user}/${repo}@${branch}`;
 
     $.getScript(`${cdn}/dyk-core.js`).then(() => {
