@@ -1,16 +1,14 @@
 /**
- * DYKCore.js - Core functionality for the Did You Know (DYK) nomination tool.
- * This file handles API interactions and data formatting.
+ * Core logic for the DYK nomination tool.
+ * Handles API calls, wikitext generation, and other data-related tasks.
  */
 
 window.DYKCore = (function($) {
     const api = new mw.Api();
+    const DYK_PAGE = 'টেমপ্লেট_আলোচনা:আপনি_জানেন_কি';
 
     /**
      * Parse wikitext to HTML for previewing.
-     * @param {string} wikitext 
-     * @param {string} title 
-     * @returns {Promise<string>}
      */
     async function getPreview(wikitext, title) {
         try {
@@ -35,8 +33,7 @@ window.DYKCore = (function($) {
     }
 
     /**
-     * Fixes lazy-loaded images in the preview content.
-     * @param {jQuery} $container 
+     * Fixes lazy-loaded images in the preview.
      */
     function fixLazyImages($container) {
         $container.find('.lazy-image-placeholder').each(function() {
@@ -63,9 +60,7 @@ window.DYKCore = (function($) {
     }
 
     /**
-     * Get article creator (first revision user).
-     * @param {string} title 
-     * @returns {Promise<string>}
+     * Get article creator (the user who made the first revision).
      */
     async function getArticleCreator(title) {
         try {
@@ -85,14 +80,12 @@ window.DYKCore = (function($) {
             return page.revisions[0].user;
         } catch (error) {
             console.error('Error fetching article creator:', error);
-            return mw.config.get('wgUserName'); // Fallback to current user
+            return mw.config.get('wgUserName'); // Default to current user
         }
     }
 
     /**
-     * Generate wikitext for nomination.
-     * @param {Object} data 
-     * @returns {string}
+     * Generate the final wikitext for the nomination.
      */
     function generateWikitext(data) {
         const { article, mainHook, altHooks = [], image, caption, status, nominator, articleCreator } = data;
@@ -109,11 +102,7 @@ window.DYKCore = (function($) {
     }
 
     /**
-     * Post the nomination to the target page.
-     * @param {string} pageTitle 
-     * @param {string} text 
-     * @param {string} summary 
-     * @returns {Promise<void>}
+     * Post the nomination to the main DYK page.
      */
     async function postNomination(pageTitle, text, summary) {
         try {
@@ -144,9 +133,7 @@ window.DYKCore = (function($) {
     }
 
     /**
-     * Prefix search for article suggestions.
-     * @param {string} query 
-     * @returns {Promise<string[]>}
+     * Search for article titles based on user input.
      */
     async function fetchSuggestions(query) {
         if (!query) return [];
@@ -166,15 +153,14 @@ window.DYKCore = (function($) {
     }
 
     /**
-     * Helper to convert numbers to Bengali.
-     * @param {number|string} num 
-     * @returns {string}
+     * Simple helper to turn English numbers into Bengali ones.
      */
     function toBengaliDigits(num) {
         return num.toString().replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
     }
 
     return {
+        DYK_PAGE,
         getPreview,
         fixLazyImages,
         getArticleCreator,
@@ -185,3 +171,4 @@ window.DYKCore = (function($) {
     };
 
 })(jQuery);
+

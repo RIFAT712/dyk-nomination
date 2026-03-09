@@ -1,6 +1,6 @@
 ﻿// <nowiki>
 /**
- * DYKUI.js - UI components for the Did You Know (DYK) nomination tool.
+ * UI components for the DYK nomination tool.
  */
 const getDYKApp = (require, initialState) => {
     const { ref, reactive, computed, watch, nextTick, onMounted } = require('vue');
@@ -21,7 +21,7 @@ const getDYKApp = (require, initialState) => {
                 class="dyk-custom-dialog"
             >
                 <div class="dyk-form">
-                    <!-- Article and Nominator Section -->
+                    <!-- Article and Nominator section -->
                     <div class="dyk-form-section">
                         <cdx-field :status="errors.article ? 'error' : 'default'" :messages="errors.article ? { error: errors.article } : {}">
                             <template #label>নিবন্ধের নাম</template>
@@ -59,7 +59,7 @@ const getDYKApp = (require, initialState) => {
                         </cdx-field>
                     </div>
 
-                    <!-- Image and Caption Section -->
+                    <!-- Image and caption section -->
                     <div class="dyk-form-section">
                         <cdx-field :status="errors.image ? 'error' : 'default'" :messages="errors.image ? { error: errors.image } : {}">
                             <template #label>ছবি প্রদান করুন (ঐচ্ছিক)</template>
@@ -81,7 +81,7 @@ const getDYKApp = (require, initialState) => {
                         </cdx-field>
                     </div>
 
-                    <!-- Hooks Section -->
+                    <!-- Hooks section -->
                     <div class="dyk-hooks-section">
                         <div class="dyk-hooks-header">
                             <label style="font-weight: bold; color: #202122;">ভুক্তি (Hooks)</label>
@@ -124,13 +124,13 @@ const getDYKApp = (require, initialState) => {
                         </cdx-button>
                     </div>
 
-                    <!-- Loading State -->
+                    <!-- Loading state indicator -->
                     <div v-if="loading" class="dyk-loading">
                         <cdx-progress-bar />
                         <p style="color: #72777d; margin-top: 8px;">অনুগ্রহ করে অপেক্ষা করুন...</p>
                     </div>
 
-                    <!-- Preview Section -->
+                    <!-- Live preview section -->
                     <div v-if="previewHtml" class="dyk-preview-container">
                         <div class="dyk-preview-label">
                             <cdx-icon :icon="icons.cdxIconEye" size="small" style="margin-right: 8px;"></cdx-icon>
@@ -140,7 +140,7 @@ const getDYKApp = (require, initialState) => {
                     </div>
                 </div>
 
-                <!-- Dialog Footer -->
+                <!-- Footer with action buttons -->
                 <template #footer>
                     <div class="dyk-footer-container">
                         <div class="dyk-footer-left">
@@ -204,6 +204,7 @@ const getDYKApp = (require, initialState) => {
                 if (article) form.article = article;
             }
 
+            // Load icons from the MediaWiki API on mount.
             onMounted(async () => {
                 const api = new mw.Api({ userAgent: 'DYKNominationTool/1.0.0' });
                 const iconNames = [
@@ -215,6 +216,7 @@ const getDYKApp = (require, initialState) => {
                 Object.assign(icons, data.query.codexicons);
             });
 
+            // Calculate how many characters are left for the hook.
             const remainingChars = computed(() => {
                 const MAX = 200;
                 const stripWikitext = (t) => t.replace(/\[\[(?:[^\|\]]*\|)?([^\]]+)\]\]/g, '$1');
@@ -241,6 +243,7 @@ const getDYKApp = (require, initialState) => {
             function addAltHook() { if (form.altHooks.length < 4) form.altHooks.push(''); }
             function removeAltHook(index) { form.altHooks.splice(index, 1); }
 
+            // Basic validation for the form fields.
             function validate() {
                 let isValid = true;
                 errors.article = ''; errors.image = '';
@@ -254,28 +257,30 @@ const getDYKApp = (require, initialState) => {
                 return isValid && form.mainHook.trim() !== '';
             }
 
+            // Generate wikitext and fetch its HTML preview.
             async function handlePreview() {
                 if (!validate()) return;
                 loading.value = true;
                 try {
                     const creator = await DYKCore.getArticleCreator(form.article);
                     const wikitext = DYKCore.generateWikitext({ ...form, articleCreator: creator });
-                    previewHtml.value = await DYKCore.getPreview(wikitext, 'টেমপ্লেট আলোচনা:আপনি জানেন কি');
+                    previewHtml.value = await DYKCore.getPreview(wikitext, DYKCore.DYK_PAGE);
                     nextTick(() => DYKCore.fixLazyImages($('.dyk-preview')));
                 } catch (e) { previewHtml.value = `<div style="color:#d33">${e.message}</div>`; }
                 finally { loading.value = false; }
             }
 
+            // Post the nomination to the wiki.
             async function handleSubmit() {
                 if (!validate()) return;
                 loading.value = true;
                 try {
                     const creator = await DYKCore.getArticleCreator(form.article);
                     const wikitext = DYKCore.generateWikitext({ ...form, articleCreator: creator });
-                    await DYKCore.postNomination('টেমপ্লেট আলোচনা:আপনি জানেন কি', wikitext, 'আজাকি মনোনয়ন যোগ করা হয়েছে');
+                    await DYKCore.postNomination(DYKCore.DYK_PAGE, wikitext, 'আজাকি মনোনয়ন যোগ করা হয়েছে');
                     mw.notify('সফলভাবে আজাকি মনোনয়ন যুক্ত হয়েছে!');
                     close();
-                    if (mw.config.get('wgPageName') === 'টেমপ্লেট_আলোচনা:আপনি_জানেন_কি') location.reload();
+                    if (mw.config.get('wgPageName') === DYKCore.DYK_PAGE) location.reload();
                 } catch (e) { mw.notify(e.message, { type: 'error' }); }
                 finally { loading.value = false; }
             }
@@ -286,24 +291,24 @@ const getDYKApp = (require, initialState) => {
                 open, close, handleArticleInput, selectSuggestion,
                 addAltHook, removeAltHook, handlePreview, handleSubmit,
                 openMainPage: () => window.open(mw.util.getUrl('উইকিপিডিয়া:আপনি জানেন কি'), '_blank')
-            };        }
+            };
+        }
     };
 };
 
 
+
 /**
- * DYKCore.js - Core functionality for the Did You Know (DYK) nomination tool.
- * This file handles API interactions and data formatting.
+ * Core logic for the DYK nomination tool.
+ * Handles API calls, wikitext generation, and other data-related tasks.
  */
 
-window.DYKCore = (function($) {
+window.DYKCore = (function ($) {
     const api = new mw.Api();
-
+    // const DYK_PAGE = 'টেমপ্লেট_আলোচনা:আপনি_জানেন_কি';
+    const DYK_PAGE = 'User:R1F4T/খেলাঘর';
     /**
      * Parse wikitext to HTML for previewing.
-     * @param {string} wikitext 
-     * @param {string} title 
-     * @returns {Promise<string>}
      */
     async function getPreview(wikitext, title) {
         try {
@@ -328,11 +333,10 @@ window.DYKCore = (function($) {
     }
 
     /**
-     * Fixes lazy-loaded images in the preview content.
-     * @param {jQuery} $container 
+     * Fixes lazy-loaded images in the preview.
      */
     function fixLazyImages($container) {
-        $container.find('.lazy-image-placeholder').each(function() {
+        $container.find('.lazy-image-placeholder').each(function () {
             const $placeholder = $(this);
             let src = $placeholder.attr('data-mw-src');
             if (!src) return;
@@ -356,9 +360,7 @@ window.DYKCore = (function($) {
     }
 
     /**
-     * Get article creator (first revision user).
-     * @param {string} title 
-     * @returns {Promise<string>}
+     * Get article creator (the user who made the first revision).
      */
     async function getArticleCreator(title) {
         try {
@@ -378,14 +380,12 @@ window.DYKCore = (function($) {
             return page.revisions[0].user;
         } catch (error) {
             console.error('Error fetching article creator:', error);
-            return mw.config.get('wgUserName'); // Fallback to current user
+            return mw.config.get('wgUserName'); // Default to current user
         }
     }
 
     /**
-     * Generate wikitext for nomination.
-     * @param {Object} data 
-     * @returns {string}
+     * Generate the final wikitext for the nomination.
      */
     function generateWikitext(data) {
         const { article, mainHook, altHooks = [], image, caption, status, nominator, articleCreator } = data;
@@ -393,20 +393,16 @@ window.DYKCore = (function($) {
         const imageTemplate = image.trim() ? `<div style="float:right;margin-left:0.5em;">[[File:${image}|100x100px|${caption}]]</div>` : '';
         const statusText = status === 'নতুন' ? 'কর্তৃক প্রণীত নতুন নিবন্ধ' : 'দ্বারা উল্লেখযোগ্যভাবে বর্ধিত নিবন্ধ;';
         const nominatorText = isSelfNom ? 'স্বমনোনীত;' : `মনোনয়ন করেছেন [[ব্যবহারকারী:${nominator}|${nominator}]] ([[ব্যবহারকারী আলাপ:${nominator}|আলাপ]])`;
-        
+
         const hooksText = [`*...${mainHook}?`, ...altHooks.map((h, i) => `${'*'.repeat(i + 2)}'''বিকল্প:''' ...${h}?`)].join('\n');
-        
+
         const footer = `-- ব্যবহারকারী [[ব্যবহারকারী:${articleCreator}|${articleCreator}]] ([[ব্যবহারকারী আলাপ:${articleCreator}|আলাপ]]) ${statusText} ও ${nominatorText} ~~~~~`;
 
         return `== ${article} ==\n${imageTemplate}\n\n${hooksText}\n\n${footer}`;
     }
 
     /**
-     * Post the nomination to the target page.
-     * @param {string} pageTitle 
-     * @param {string} text 
-     * @param {string} summary 
-     * @returns {Promise<void>}
+     * Post the nomination to the main DYK page.
      */
     async function postNomination(pageTitle, text, summary) {
         try {
@@ -422,7 +418,7 @@ window.DYKCore = (function($) {
                 throw new Error(`পাতাটি পাওয়া যায়নি: ${pageTitle}`);
             }
             const currentContent = page.revisions[0].content || '';
-            
+
             await api.postWithEditToken({
                 action: 'edit',
                 title: pageTitle,
@@ -437,9 +433,7 @@ window.DYKCore = (function($) {
     }
 
     /**
-     * Prefix search for article suggestions.
-     * @param {string} query 
-     * @returns {Promise<string[]>}
+     * Search for article titles based on user input.
      */
     async function fetchSuggestions(query) {
         if (!query) return [];
@@ -459,15 +453,14 @@ window.DYKCore = (function($) {
     }
 
     /**
-     * Helper to convert numbers to Bengali.
-     * @param {number|string} num 
-     * @returns {string}
+     * Simple helper to turn English numbers into Bengali ones.
      */
     function toBengaliDigits(num) {
         return num.toString().replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
     }
 
     return {
+        DYK_PAGE,
         getPreview,
         fixLazyImages,
         getArticleCreator,
@@ -481,7 +474,8 @@ window.DYKCore = (function($) {
 
 
 
-(function() {
+
+(function () {
     const style = document.createElement('style');
     style.textContent = `.dyk-form { padding: 4px; }
 .dyk-form-section { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #eaecf0; }
@@ -539,17 +533,18 @@ window.DYKCore = (function($) {
 })();
 
 /**
- * DYK.js - Entry point for the Did You Know (DYK) nomination tool.
+ * Entry point for the DYK nomination tool.
  */
 (function ($) {
     mw.loader.using(['vue', '@wikimedia/codex', 'mediawiki.api', 'mediawiki.util', 'mediawiki.user']).then((require) => {
         let vm = null;
 
+        // Initialize and mount the Vue application.
         function initApp() {
             if (!vm) {
                 const container = document.body.appendChild(document.createElement('div'));
                 container.id = 'dyk-nomination-app';
-                
+
                 const initialState = {
                     article: mw.config.get('wgNamespaceNumber') === 0 ? mw.config.get('wgTitle') : '',
                     isNamespace0: mw.config.get('wgNamespaceNumber') === 0,
@@ -559,23 +554,26 @@ window.DYKCore = (function($) {
                 const app = require('vue').createApp(getDYKApp(require, initialState));
                 vm = app.mount('#dyk-nomination-app');
             }
-            
-            // Call the open method on the mounted component instance
+
+            // Open the nomination form.
             if (vm && typeof vm.open === 'function') {
                 vm.open(mw.config.get('wgNamespaceNumber') === 0 ? mw.config.get('wgTitle') : '');
             }
         }
 
         $(document).ready(() => {
+            // Add a link in the "More" menu for articles.
             if (mw.config.get('wgNamespaceNumber') === 0) {
                 const portletLink = mw.util.addPortletLink('p-cactions', '#', 'আজাকি মনোনয়ন', 'ca-dyk');
                 if (portletLink) $(portletLink).on('click', (e) => { e.preventDefault(); initApp(); });
             }
-            if (mw.util.getParamValue('dyk-open') === '1' || (mw.config.get('wgPageName') === 'টেমপ্লেট_আলোচনা:আপনি_জানেন_কি' && location.search.includes('withJS'))) {
+            // Auto-open if the URL parameter is set or if we're on the nomination page with withJS.
+            if (mw.util.getParamValue('dyk-open') === '1' || (mw.config.get('wgPageName') === DYKCore.DYK_PAGE && location.search.includes('withJS'))) {
                 initApp();
             }
         });
     });
 })(jQuery);
+
 
 // </nowiki>
