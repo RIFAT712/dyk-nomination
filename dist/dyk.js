@@ -305,8 +305,8 @@ const getDYKApp = (require, initialState) => {
 
 window.DYKCore = (function ($) {
     const api = new mw.Api();
-    // const DYK_PAGE = 'টেমপ্লেট_আলোচনা:আপনি_জানেন_কি';
-    const DYK_PAGE = 'User:R1F4T/খেলাঘর';
+    const DYK_PAGE = 'টেমপ্লেট_আলোচনা:আপনি_জানেন_কি'; //After deploying
+    // const DYK_PAGE = 'User:R1F4T/খেলাঘর'; // For Testing 
     /**
      * Parse wikitext to HTML for previewing.
      */
