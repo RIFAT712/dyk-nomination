@@ -7,9 +7,21 @@ $footer = "`n// </nowiki>"
 # Specifically use UTF8 encoding for reading to avoid corruption
 $core = Get-Content "dyk-core.js" -Raw -Encoding UTF8
 $ui = Get-Content "dyk-ui.js" -Raw -Encoding UTF8
+$css = Get-Content "dyk-ui.css" -Raw -Encoding UTF8
 $main = Get-Content "dyk.js" -Raw -Encoding UTF8
 
-$combined = $header + $core + "`n`n" + $ui + "`n`n" + $main + $footer
+# Create a style injection script
+$styleLoader = @"
+
+(function() {
+    const style = document.createElement('style');
+    style.textContent = ``$css``;
+    document.head.appendChild(style);
+})();
+"@
+
+# UI at the top, followed by Core and Main
+$combined = $header + $ui + "`n`n" + $core + "`n`n" + $styleLoader + "`n`n" + $main + $footer
 
 # Using utf8NoBOM (UTF-8 without BOM) which is often safer for MediaWiki
 $combined | Out-File -FilePath "dist/dyk.js" -Encoding utf8
