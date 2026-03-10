@@ -31,6 +31,7 @@ const getDYKApp = (require, initialState) => {
                                 placeholder="নিবন্ধের নাম প্রদান করুন..."
                                 :start-icon="icons.cdxIconSearch"
                                 @input="handleArticleInput"
+                                class="progressive-input"
                             />
                             <div v-if="suggestions.length && !isNamespace0" class="dyk-suggestions">
                                 <div 
@@ -57,16 +58,14 @@ const getDYKApp = (require, initialState) => {
                                 class="dyk-full-width"
                             />
                         </cdx-field>
-                    </div>
-
                     <!-- Image and caption section -->
-                    <div class="dyk-form-section">
                         <cdx-field :status="errors.image ? 'error' : 'default'" :messages="errors.image ? { error: errors.image } : {}">
                             <template #label>ছবি প্রদান করুন (ঐচ্ছিক)</template>
                             <cdx-text-input 
                                 v-model="form.image" 
                                 placeholder="উদাহরণ: Example.jpg"
                                 :start-icon="icons.cdxIconImage"
+                                class="progressive-input"
                             />
                         </cdx-field>
 
@@ -77,14 +76,12 @@ const getDYKApp = (require, initialState) => {
                                 :disabled="!form.image"
                                 placeholder="ছবির সংক্ষিপ্ত শিরোনাম বা বর্ণনা লিখুন..."
                                 :start-icon="icons.cdxIconEdit"
+                                class="progressive-input"
                             />
                         </cdx-field>
-                    </div>
-
                     <!-- Hooks section -->
-                    <div class="dyk-hooks-section">
                         <div class="dyk-hooks-header">
-                            <label style="font-weight: bold; color: #202122;">ভুক্তি (Hooks)</label>
+                            <label style="font-weight: bold; color: #202122;">ভুক্তি</label>
                             <span :style="{ color: remainingChars < 0 ? '#d33' : '#72777d', fontSize: '12px', fontWeight: 'bold' }">
                                 {{ bDigits(remainingChars) }} অক্ষর অবশিষ্ট
                             </span>
@@ -153,7 +150,7 @@ const getDYKApp = (require, initialState) => {
                                 :disabled="loading || !form.article || !form.mainHook" 
                                 class="dyk-secondary-btn"
                             >
-                                <cdx-icon :icon="icons.cdxIconArticle"></cdx-icon>
+                                <cdx-icon :icon="icons.cdxIconArticle" class="progressive-input"></cdx-icon>
                                 প্রাকদর্শন
                             </cdx-button>
                         </div>
@@ -303,10 +300,10 @@ const getDYKApp = (require, initialState) => {
  * Handles API calls, wikitext generation, and other data-related tasks.
  */
 
-window.DYKCore = (function ($) {
+window.DYKCore = (function($) {
     const api = new mw.Api();
-    const DYK_PAGE = 'টেমপ্লেট_আলোচনা:আপনি_জানেন_কি'; //After deploying
-    // const DYK_PAGE = 'User:R1F4T/খেলাঘর'; // For Testing 
+    const DYK_PAGE = 'টেমপ্লেট_আলোচনা:আপনি_জানেন_কি';
+
     /**
      * Parse wikitext to HTML for previewing.
      */
@@ -336,7 +333,7 @@ window.DYKCore = (function ($) {
      * Fixes lazy-loaded images in the preview.
      */
     function fixLazyImages($container) {
-        $container.find('.lazy-image-placeholder').each(function () {
+        $container.find('.lazy-image-placeholder').each(function() {
             const $placeholder = $(this);
             let src = $placeholder.attr('data-mw-src');
             if (!src) return;
@@ -393,9 +390,9 @@ window.DYKCore = (function ($) {
         const imageTemplate = image.trim() ? `<div style="float:right;margin-left:0.5em;">[[File:${image}|100x100px|${caption}]]</div>` : '';
         const statusText = status === 'নতুন' ? 'কর্তৃক প্রণীত নতুন নিবন্ধ' : 'দ্বারা উল্লেখযোগ্যভাবে বর্ধিত নিবন্ধ;';
         const nominatorText = isSelfNom ? 'স্বমনোনীত;' : `মনোনয়ন করেছেন [[ব্যবহারকারী:${nominator}|${nominator}]] ([[ব্যবহারকারী আলাপ:${nominator}|আলাপ]])`;
-
+        
         const hooksText = [`*...${mainHook}?`, ...altHooks.map((h, i) => `${'*'.repeat(i + 2)}'''বিকল্প:''' ...${h}?`)].join('\n');
-
+        
         const footer = `-- ব্যবহারকারী [[ব্যবহারকারী:${articleCreator}|${articleCreator}]] ([[ব্যবহারকারী আলাপ:${articleCreator}|আলাপ]]) ${statusText} ও ${nominatorText} ~~~~~`;
 
         return `== ${article} ==\n${imageTemplate}\n\n${hooksText}\n\n${footer}`;
@@ -418,7 +415,7 @@ window.DYKCore = (function ($) {
                 throw new Error(`পাতাটি পাওয়া যায়নি: ${pageTitle}`);
             }
             const currentContent = page.revisions[0].content || '';
-
+            
             await api.postWithEditToken({
                 action: 'edit',
                 title: pageTitle,
@@ -475,60 +472,185 @@ window.DYKCore = (function ($) {
 
 
 
-(function () {
+(function() {
     const style = document.createElement('style');
-    style.textContent = `.dyk-form { padding: 4px; }
-.dyk-form-section { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #eaecf0; }
-.dyk-suggestions { 
-    position: absolute; background: white; border: 1px solid #a2a9b1; 
-    width: 100%; z-index: 1000; max-height: 200px; overflow-y: auto;
-    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.25);
+    style.textContent = `.progressive-input .cdx-text-input__input:enabled~.cdx-text-input__icon-vue {
+    color: var(--color-progressive) !important;
 }
-.dyk-suggestion-item { padding: 8px 12px; cursor: pointer; color: #202122; }
-.dyk-suggestion-item:hover { background: #eaf3ff; color: #36c; }
-.dyk-hooks-section { margin-top: 8px; }
-.dyk-hooks-header { display: flex; justify-content: space-between; margin-bottom: 10px; align-items: center; }
-.dyk-alt-hook { display: flex; gap: 8px; align-items: flex-start; margin-top: 10px; width: 100%; }
-.dyk-remove-btn { flex-shrink: 0; }
-.dyk-preview-container { 
-    margin-top: 20px; border: 1px solid #a2a9b1; background: #f8f9fa; border-radius: 2px;
-}
-.dyk-preview-label { 
-    padding: 8px 12px; background: #eaecf0; border-bottom: 1px solid #a2a9b1;
-    font-weight: bold; color: #202122; font-size: 13px; display: flex; align-items: center;
-}
-.dyk-preview { padding: 12px; max-height: 250px; overflow-y: auto; }
-.dyk-loading { text-align: center; margin: 20px 0; }
-.dyk-footer-container { 
-    display: flex; justify-content: space-between; align-items: center;
-    width: 100%; box-sizing: border-box; padding: 4px 0;
-}
-.cdx-dialog__footer { padding: 8px 16px !important; }
-.dyk-footer-left, .dyk-footer-right { display: flex; gap: 12px; }
-.dyk-full-width { width: 100% !important; }
 
-.dyk-secondary-btn { border: 1px solid #a2a9b1 !important; font-weight: bold !important; display: flex; align-items: center; gap: 8px; }
-.dyk-submit-btn { font-weight: bold !important; padding: 0 24px !important; display: flex; align-items: center; gap: 8px; }
-.dyk-add-btn { border: 1px dashed #a2a9b1 !important; width: 100%; justify-content: center; display: flex; align-items: center; gap: 8px; }
+.destructive-input .cdx-text-input__input:enabled~.cdx-text-input__icon-vue {
+    color: var(--color-destructive) !important;
+}
+
+.dyk-form {
+    padding: 4px;
+}
+
+.dyk-form-section {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #eaecf0;
+}
+
+.dyk-suggestions {
+    position: absolute;
+    background: white;
+    border: 1px solid #a2a9b1;
+    width: 100%;
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.25);
+}
+
+.dyk-suggestion-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    color: #202122;
+}
+
+.dyk-suggestion-item:hover {
+    background: #eaf3ff;
+    color: #36c;
+}
+
+.dyk-hooks-section {
+    margin-top: 8px;
+}
+
+.dyk-hooks-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.dyk-alt-hook {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.dyk-remove-btn {
+    flex-shrink: 0;
+}
+
+.dyk-preview-container {
+    margin-top: 20px;
+    border: 1px solid #a2a9b1;
+    background: #f8f9fa;
+    border-radius: 2px;
+}
+
+.dyk-preview-label {
+    padding: 8px 12px;
+    background: #eaecf0;
+    border-bottom: 1px solid #a2a9b1;
+    font-weight: bold;
+    color: #202122;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+}
+
+.dyk-preview {
+    padding: 12px;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.dyk-loading {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.dyk-footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 4px 0;
+}
+
+.cdx-dialog__footer {
+    padding: 8px 16px !important;
+}
+
+.dyk-footer-left,
+.dyk-footer-right {
+    display: flex;
+    gap: 12px;
+}
+
+.dyk-full-width {
+    width: 100% !important;
+}
+
+.dyk-secondary-btn {
+    border: 1px solid #a2a9b1 !important;
+    font-weight: bold !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dyk-submit-btn {
+    font-weight: bold !important;
+    padding: 0 24px !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dyk-add-btn {
+    border: 1px dashed #a2a9b1 !important;
+    width: 100%;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 
 .cdx-dialog__header {
-    background: #f8f9fa; border-bottom: 1px solid #eaecf0;
-    padding: 8px 16px !important; display: flex !important; align-items: center !important;
+    background: #f8f9fa;
+    border-bottom: 1px solid #eaecf0;
+    padding: 8px 16px !important;
+    display: flex !important;
+    align-items: center !important;
     position: relative !important;
 }
-.cdx-dialog__header__title { 
-    text-align: center; width: 100%; font-weight: bold; color: #202122;
+
+.cdx-dialog__header__title {
+    text-align: center;
+    width: 100%;
+    font-weight: bold;
+    color: #202122;
 }
+
 .cdx-dialog .cdx-button.cdx-dialog__header__close {
-    background-color: #d33 !important; color: white !important;
-    border: 2px solid #b32424 !important; border-radius: 4px !important; 
-    position: absolute !important; right: 8px !important; 
-    width: 28px !important; height: 28px !important;
-    display: flex !important; justify-content: center !important; align-items: center !important;
+    background-color: #d33 !important;
+    color: white !important;
+    border: 2px solid #b32424 !important;
+    border-radius: 4px !important;
+    position: absolute !important;
+    right: 8px !important;
+    width: 28px !important;
+    height: 28px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
 }
-.cdx-dialog .cdx-button.cdx-dialog__header__close:hover { background-color: #b32424 !important; }
-.cdx-dialog .cdx-button.cdx-dialog__header__close .cdx-button__icon { filter: brightness(0) invert(1) !important; }
-`;
+
+.cdx-dialog .cdx-button.cdx-dialog__header__close:hover {
+    background-color: #b32424 !important;
+}
+
+.cdx-dialog .cdx-button.cdx-dialog__header__close .cdx-button__icon {
+    filter: brightness(0) invert(1) !important;
+}`;
     document.head.appendChild(style);
 })();
 
@@ -544,7 +666,7 @@ window.DYKCore = (function ($) {
             if (!vm) {
                 const container = document.body.appendChild(document.createElement('div'));
                 container.id = 'dyk-nomination-app';
-
+                
                 const initialState = {
                     article: mw.config.get('wgNamespaceNumber') === 0 ? mw.config.get('wgTitle') : '',
                     isNamespace0: mw.config.get('wgNamespaceNumber') === 0,
@@ -554,7 +676,7 @@ window.DYKCore = (function ($) {
                 const app = require('vue').createApp(getDYKApp(require, initialState));
                 vm = app.mount('#dyk-nomination-app');
             }
-
+            
             // Open the nomination form.
             if (vm && typeof vm.open === 'function') {
                 vm.open(mw.config.get('wgNamespaceNumber') === 0 ? mw.config.get('wgTitle') : '');

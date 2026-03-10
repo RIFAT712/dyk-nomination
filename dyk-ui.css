@@ -1,51 +1,177 @@
-.dyk-form { padding: 4px; }
-.dyk-form-section { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #eaecf0; }
-.dyk-suggestions { 
-    position: absolute; background: white; border: 1px solid #a2a9b1; 
-    width: 100%; z-index: 1000; max-height: 200px; overflow-y: auto;
-    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.25);
+.progressive-input .cdx-text-input__input:enabled~.cdx-text-input__icon-vue {
+    color: var(--color-progressive) !important;
 }
-.dyk-suggestion-item { padding: 8px 12px; cursor: pointer; color: #202122; }
-.dyk-suggestion-item:hover { background: #eaf3ff; color: #36c; }
-.dyk-hooks-section { margin-top: 8px; }
-.dyk-hooks-header { display: flex; justify-content: space-between; margin-bottom: 10px; align-items: center; }
-.dyk-alt-hook { display: flex; gap: 8px; align-items: flex-start; margin-top: 10px; width: 100%; }
-.dyk-remove-btn { flex-shrink: 0; }
-.dyk-preview-container { 
-    margin-top: 20px; border: 1px solid #a2a9b1; background: #f8f9fa; border-radius: 2px;
-}
-.dyk-preview-label { 
-    padding: 8px 12px; background: #eaecf0; border-bottom: 1px solid #a2a9b1;
-    font-weight: bold; color: #202122; font-size: 13px; display: flex; align-items: center;
-}
-.dyk-preview { padding: 12px; max-height: 250px; overflow-y: auto; }
-.dyk-loading { text-align: center; margin: 20px 0; }
-.dyk-footer-container { 
-    display: flex; justify-content: space-between; align-items: center;
-    width: 100%; box-sizing: border-box; padding: 4px 0;
-}
-.cdx-dialog__footer { padding: 8px 16px !important; }
-.dyk-footer-left, .dyk-footer-right { display: flex; gap: 12px; }
-.dyk-full-width { width: 100% !important; }
 
-.dyk-secondary-btn { border: 1px solid #a2a9b1 !important; font-weight: bold !important; display: flex; align-items: center; gap: 8px; }
-.dyk-submit-btn { font-weight: bold !important; padding: 0 24px !important; display: flex; align-items: center; gap: 8px; }
-.dyk-add-btn { border: 1px dashed #a2a9b1 !important; width: 100%; justify-content: center; display: flex; align-items: center; gap: 8px; }
+.destructive-input .cdx-text-input__input:enabled~.cdx-text-input__icon-vue {
+    color: var(--color-destructive) !important;
+}
+
+.dyk-form {
+    padding: 4px;
+}
+
+.dyk-form-section {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #eaecf0;
+}
+
+.dyk-suggestions {
+    position: absolute;
+    background: white;
+    border: 1px solid #a2a9b1;
+    width: 100%;
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.25);
+}
+
+.dyk-suggestion-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    color: #202122;
+}
+
+.dyk-suggestion-item:hover {
+    background: #eaf3ff;
+    color: #36c;
+}
+
+.dyk-hooks-section {
+    margin-top: 8px;
+}
+
+.dyk-hooks-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.dyk-alt-hook {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.dyk-remove-btn {
+    flex-shrink: 0;
+}
+
+.dyk-preview-container {
+    margin-top: 20px;
+    border: 1px solid #a2a9b1;
+    background: #f8f9fa;
+    border-radius: 2px;
+}
+
+.dyk-preview-label {
+    padding: 8px 12px;
+    background: #eaecf0;
+    border-bottom: 1px solid #a2a9b1;
+    font-weight: bold;
+    color: #202122;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+}
+
+.dyk-preview {
+    padding: 12px;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.dyk-loading {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.dyk-footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 4px 0;
+}
+
+.cdx-dialog__footer {
+    padding: 8px 16px !important;
+}
+
+.dyk-footer-left,
+.dyk-footer-right {
+    display: flex;
+    gap: 12px;
+}
+
+.dyk-full-width {
+    width: 100% !important;
+}
+
+.dyk-secondary-btn {
+    border: 1px solid #a2a9b1 !important;
+    font-weight: bold !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dyk-submit-btn {
+    font-weight: bold !important;
+    padding: 0 24px !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dyk-add-btn {
+    border: 1px dashed #a2a9b1 !important;
+    width: 100%;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 
 .cdx-dialog__header {
-    background: #f8f9fa; border-bottom: 1px solid #eaecf0;
-    padding: 8px 16px !important; display: flex !important; align-items: center !important;
+    background: #f8f9fa;
+    border-bottom: 1px solid #eaecf0;
+    padding: 8px 16px !important;
+    display: flex !important;
+    align-items: center !important;
     position: relative !important;
 }
-.cdx-dialog__header__title { 
-    text-align: center; width: 100%; font-weight: bold; color: #202122;
+
+.cdx-dialog__header__title {
+    text-align: center;
+    width: 100%;
+    font-weight: bold;
+    color: #202122;
 }
+
 .cdx-dialog .cdx-button.cdx-dialog__header__close {
-    background-color: #d33 !important; color: white !important;
-    border: 2px solid #b32424 !important; border-radius: 4px !important; 
-    position: absolute !important; right: 8px !important; 
-    width: 28px !important; height: 28px !important;
-    display: flex !important; justify-content: center !important; align-items: center !important;
+    background-color: #d33 !important;
+    color: white !important;
+    border: 2px solid #b32424 !important;
+    border-radius: 4px !important;
+    position: absolute !important;
+    right: 8px !important;
+    width: 28px !important;
+    height: 28px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
 }
-.cdx-dialog .cdx-button.cdx-dialog__header__close:hover { background-color: #b32424 !important; }
-.cdx-dialog .cdx-button.cdx-dialog__header__close .cdx-button__icon { filter: brightness(0) invert(1) !important; }
+
+.cdx-dialog .cdx-button.cdx-dialog__header__close:hover {
+    background-color: #b32424 !important;
+}
+
+.cdx-dialog .cdx-button.cdx-dialog__header__close .cdx-button__icon {
+    filter: brightness(0) invert(1) !important;
+}

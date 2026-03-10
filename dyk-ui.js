@@ -30,6 +30,7 @@ const getDYKApp = (require, initialState) => {
                                 placeholder="নিবন্ধের নাম প্রদান করুন..."
                                 :start-icon="icons.cdxIconSearch"
                                 @input="handleArticleInput"
+                                class="progressive-input"
                             />
                             <div v-if="suggestions.length && !isNamespace0" class="dyk-suggestions">
                                 <div 
@@ -56,16 +57,14 @@ const getDYKApp = (require, initialState) => {
                                 class="dyk-full-width"
                             />
                         </cdx-field>
-                    </div>
-
                     <!-- Image and caption section -->
-                    <div class="dyk-form-section">
                         <cdx-field :status="errors.image ? 'error' : 'default'" :messages="errors.image ? { error: errors.image } : {}">
                             <template #label>ছবি প্রদান করুন (ঐচ্ছিক)</template>
                             <cdx-text-input 
                                 v-model="form.image" 
                                 placeholder="উদাহরণ: Example.jpg"
                                 :start-icon="icons.cdxIconImage"
+                                class="progressive-input"
                             />
                         </cdx-field>
 
@@ -76,14 +75,12 @@ const getDYKApp = (require, initialState) => {
                                 :disabled="!form.image"
                                 placeholder="ছবির সংক্ষিপ্ত শিরোনাম বা বর্ণনা লিখুন..."
                                 :start-icon="icons.cdxIconEdit"
+                                class="progressive-input"
                             />
                         </cdx-field>
-                    </div>
-
                     <!-- Hooks section -->
-                    <div class="dyk-hooks-section">
                         <div class="dyk-hooks-header">
-                            <label style="font-weight: bold; color: #202122;">ভুক্তি (Hooks)</label>
+                            <label style="font-weight: bold; color: #202122;">ভুক্তি</label>
                             <span :style="{ color: remainingChars < 0 ? '#d33' : '#72777d', fontSize: '12px', fontWeight: 'bold' }">
                                 {{ bDigits(remainingChars) }} অক্ষর অবশিষ্ট
                             </span>
@@ -152,7 +149,7 @@ const getDYKApp = (require, initialState) => {
                                 :disabled="loading || !form.article || !form.mainHook" 
                                 class="dyk-secondary-btn"
                             >
-                                <cdx-icon :icon="icons.cdxIconArticle"></cdx-icon>
+                                <cdx-icon :icon="icons.cdxIconArticle" class="progressive-input"></cdx-icon>
                                 প্রাকদর্শন
                             </cdx-button>
                         </div>
