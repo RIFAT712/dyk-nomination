@@ -140,14 +140,46 @@ window.DYKCore = (function($) {
         try {
             const response = await api.get({
                 action: 'query',
-                list: 'prefixsearch',
-                pssearch: query,
-                pslimit: 10,
-                format: 'json'
+                generator: 'prefixsearch',
+                gpssearch: query,
+                gpslimit: 10,
+                redirects: 1,
+                formatversion: 2
             });
-            return (response.query.prefixsearch || []).map(i => i.title);
+            if (!response.query || !response.query.pages) return [];
+            const titles = response.query.pages.map(p => p.title);
+            return [...new Set(titles)];
         } catch (error) {
             console.error('Fetch suggestions error:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Search for images based on user input.
+     */
+    async function fetchImageSuggestions(query) {
+        if (!query) return [];
+        try {
+            const response = await api.get({
+                action: 'query',
+                generator: 'prefixsearch',
+                gpssearch: query,
+                gpsnamespace: 6,
+                gpslimit: 10,
+                redirects: 1,
+                prop: 'pageimages',
+                piprop: 'thumbnail',
+                pithumbsize: 50,
+                formatversion: 2
+            });
+            if (!response.query || !response.query.pages) return [];
+            return response.query.pages.map(p => ({
+                title: p.title.replace(/^[^:]+:/, ''), // Strip "File:" prefix
+                thumb: p.thumbnail ? p.thumbnail.source : null
+            }));
+        } catch (error) {
+            console.error('Fetch image suggestions error:', error);
             return [];
         }
     }
@@ -167,6 +199,7 @@ window.DYKCore = (function($) {
         generateWikitext,
         postNomination,
         fetchSuggestions,
+        fetchImageSuggestions,
         toBengaliDigits
     };
 

@@ -2,10 +2,10 @@
  * UI components for the DYK nomination tool.
  */
 const getDYKApp = (require, initialState) => {
-    const { ref, reactive, computed, watch, nextTick, onMounted } = require('vue');
+    const { ref, reactive, computed, watch, nextTick, onMounted, onUnmounted } = require('vue');
     const {
         CdxDialog, CdxButton, CdxTextInput, CdxTextArea,
-        CdxSelect, CdxField, CdxProgressBar, CdxIcon
+        CdxSelect, CdxField, CdxProgressBar, CdxIcon, CdxRadio
     } = require('@wikimedia/codex');
 
     return {
@@ -15,6 +15,7 @@ const getDYKApp = (require, initialState) => {
                 :title="title"
                 :open="visible"
                 close-button-label="বন্ধ করুন"
+                :close-on-backdrop-click="false"
                 @update:open="close"
                 size="large"
                 class="dyk-custom-dialog"
@@ -24,22 +25,24 @@ const getDYKApp = (require, initialState) => {
                     <div class="dyk-form-section">
                         <cdx-field :status="errors.article ? 'error' : 'default'" :messages="errors.article ? { error: errors.article } : {}">
                             <template #label>নিবন্ধের নাম</template>
-                            <cdx-text-input 
-                                v-model="form.article" 
-                                :disabled="isNamespace0"
-                                placeholder="নিবন্ধের নাম প্রদান করুন..."
-                                :start-icon="icons.cdxIconSearch"
-                                @input="handleArticleInput"
-                                class="progressive-input"
-                            />
-                            <div v-if="suggestions.length && !isNamespace0" class="dyk-suggestions">
-                                <div 
-                                    v-for="s in suggestions" 
-                                    :key="s" 
-                                    @click="selectSuggestion(s)"
-                                    class="dyk-suggestion-item"
-                                >
-                                    {{ s }}
+                            <div class="dyk-suggest-wrapper" @mousedown.stop>
+                                <cdx-text-input 
+                                    v-model="form.article" 
+                                    :disabled="isNamespace0"
+                                    placeholder="নিবন্ধের নাম প্রদান করুন..."
+                                    :start-icon="icons.cdxIconSearch"
+                                    @input="handleArticleInput"
+                                    class="progressive-input article-input"
+                                />
+                                <div v-if="suggestions.length && !isNamespace0" class="dyk-suggestions">
+                                    <div 
+                                        v-for="s in suggestions" 
+                                        :key="s" 
+                                        @click.stop="selectSuggestion(s)"
+                                        class="dyk-suggestion-item"
+                                    >
+                                        {{ s }}
+                                    </div>
                                 </div>
                             </div>
                         </cdx-field>
@@ -51,21 +54,44 @@ const getDYKApp = (require, initialState) => {
 
                         <cdx-field>
                             <template #label>নিবন্ধের অবস্থা</template>
-                            <cdx-select
-                                v-model:selected="form.status"
-                                :menu-items="statusOptions"
-                                class="dyk-full-width"
-                            />
+                            <div class="dyk-radio-group">
+                                <cdx-radio
+                                    v-for="option in statusOptions"
+                                    :key="option.value"
+                                    v-model="form.status"
+                                    :input-value="option.value"
+                                    inline
+                                >
+                                    {{ option.label }}
+                                </cdx-radio>
+                            </div>
                         </cdx-field>
                     <!-- Image and caption section -->
                         <cdx-field :status="errors.image ? 'error' : 'default'" :messages="errors.image ? { error: errors.image } : {}">
                             <template #label>ছবি প্রদান করুন (ঐচ্ছিক)</template>
-                            <cdx-text-input 
-                                v-model="form.image" 
-                                placeholder="উদাহরণ: Example.jpg"
-                                :start-icon="icons.cdxIconImage"
-                                class="progressive-input"
-                            />
+                            <div class="dyk-suggest-wrapper" @mousedown.stop>
+                                <cdx-text-input 
+                                    v-model="form.image" 
+                                    placeholder="উদাহরণ: Example.jpg"
+                                    :start-icon="icons.cdxIconImage"
+                                    @input="handleImageInput"
+                                    class="progressive-input image-input"
+                                />
+                                <div v-if="imageSuggestions.length" class="dyk-suggestions">
+                                    <div 
+                                        v-for="s in imageSuggestions" 
+                                        :key="s.title" 
+                                        @click.stop="selectImageSuggestion(s.title)"
+                                        class="dyk-suggestion-item dyk-image-suggestion"
+                                    >
+                                        <img v-if="s.thumb" :src="s.thumb" class="dyk-suggestion-thumb" />
+                                        <div v-else class="dyk-suggestion-thumb-placeholder">
+                                            <cdx-icon :icon="icons.cdxIconImage" size="small"></cdx-icon>
+                                        </div>
+                                        <span class="dyk-suggestion-text">{{ s.title }}</span>
+                                    </div>
+                                </div>
+                            </div>
                         </cdx-field>
 
                         <cdx-field>
@@ -170,13 +196,14 @@ const getDYKApp = (require, initialState) => {
             </cdx-dialog>
         `,
         components: {
-            CdxDialog, CdxButton, CdxTextInput, CdxTextArea, CdxSelect, CdxField, CdxProgressBar, CdxIcon
+            CdxDialog, CdxButton, CdxTextInput, CdxTextArea, CdxSelect, CdxField, CdxProgressBar, CdxIcon, CdxRadio
         },
         setup() {
             const visible = ref(false);
             const loading = ref(false);
             const previewHtml = ref('');
             const suggestions = ref([]);
+            const imageSuggestions = ref([]);
             const title = "আজাকি মনোনয়ন";
             const isNamespace0 = ref(initialState.isNamespace0);
             const icons = reactive({});
@@ -210,7 +237,29 @@ const getDYKApp = (require, initialState) => {
                 ];
                 const data = await api.get({ action: 'query', list: 'codexicons', names: iconNames });
                 Object.assign(icons, data.query.codexicons);
+
+                // Close suggestions when clicking outside.
+                document.addEventListener('click', handleGlobalClick);
             });
+
+            onUnmounted(() => {
+                document.removeEventListener('click', handleGlobalClick);
+            });
+
+            function handleGlobalClick(e) {
+                const wrapper = e.target.closest('.dyk-suggest-wrapper');
+                if (!wrapper) {
+                    suggestions.value = [];
+                    imageSuggestions.value = [];
+                } else {
+                    // If clicked inside a wrapper, clear the suggestions of the OTHER wrapper
+                    if (wrapper.querySelector('.article-input')) {
+                        imageSuggestions.value = [];
+                    } else if (wrapper.querySelector('.image-input')) {
+                        suggestions.value = [];
+                    }
+                }
+            }
 
             // Calculate how many characters are left for the hook.
             const remainingChars = computed(() => {
@@ -227,15 +276,32 @@ const getDYKApp = (require, initialState) => {
             function reset() {
                 if (!isNamespace0.value) form.article = '';
                 form.image = ''; form.caption = ''; form.mainHook = ''; form.altHooks = [];
-                previewHtml.value = ''; suggestions.value = [];
+                previewHtml.value = ''; suggestions.value = []; imageSuggestions.value = [];
             }
 
+            let suggestTimeout;
             async function handleArticleInput() {
-                if (!isNamespace0.value && form.article.length > 2) suggestions.value = await DYKCore.fetchSuggestions(form.article);
-                else suggestions.value = [];
+                clearTimeout(suggestTimeout);
+                imageSuggestions.value = []; // Clear other
+                if (!isNamespace0.value && form.article.length > 2) {
+                    suggestTimeout = setTimeout(async () => {
+                        suggestions.value = await DYKCore.fetchSuggestions(form.article);
+                    }, 300);
+                } else suggestions.value = [];
+            }
+
+            async function handleImageInput() {
+                clearTimeout(suggestTimeout);
+                suggestions.value = []; // Clear other
+                if (form.image.length > 2) {
+                    suggestTimeout = setTimeout(async () => {
+                        imageSuggestions.value = await DYKCore.fetchImageSuggestions(form.image);
+                    }, 300);
+                } else imageSuggestions.value = [];
             }
 
             function selectSuggestion(s) { form.article = s; suggestions.value = []; }
+            function selectImageSuggestion(s) { form.image = s; imageSuggestions.value = []; }
             function addAltHook() { if (form.altHooks.length < 4) form.altHooks.push(''); }
             function removeAltHook(index) { form.altHooks.splice(index, 1); }
 
@@ -283,8 +349,8 @@ const getDYKApp = (require, initialState) => {
 
             return {
                 visible, loading, form, errors, statusOptions, title, isNamespace0,
-                previewHtml, suggestions, remainingChars, bDigits, icons,
-                open, close, handleArticleInput, selectSuggestion,
+                previewHtml, suggestions, imageSuggestions, remainingChars, bDigits, icons,
+                open, close, handleArticleInput, handleImageInput, selectSuggestion, selectImageSuggestion,
                 addAltHook, removeAltHook, handlePreview, handleSubmit,
                 openMainPage: () => window.open(mw.util.getUrl('উইকিপিডিয়া:আপনি জানেন কি'), '_blank')
             };

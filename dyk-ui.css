@@ -8,29 +8,79 @@
 
 .dyk-form {
     padding: 4px;
+    overflow: visible;
 }
 
 .dyk-form-section {
     margin-bottom: 16px;
     padding-bottom: 16px;
     border-bottom: 1px solid #eaecf0;
+    overflow: visible;
+}
+
+.dyk-radio-group {
+    display: flex;
+    gap: 16px;
+    margin-top: 4px;
+}
+
+.dyk-suggest-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: visible;
 }
 
 .dyk-suggestions {
     position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
     background: white;
     border: 1px solid #a2a9b1;
-    width: 100%;
-    z-index: 1000;
+    z-index: 9999;
     max-height: 200px;
     overflow-y: auto;
-    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.25);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+    margin-top: 1px;
 }
 
 .dyk-suggestion-item {
     padding: 8px 12px;
     cursor: pointer;
     color: #202122;
+}
+
+.dyk-image-suggestion {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dyk-suggestion-thumb {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    background: #f8f9fa;
+    border: 1px solid #eaecf0;
+    flex-shrink: 0;
+}
+
+.dyk-suggestion-thumb-placeholder {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f8f9fa;
+    border: 1px solid #eaecf0;
+    flex-shrink: 0;
+    color: #72777d;
+}
+
+.dyk-suggestion-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .dyk-suggestion-item:hover {
@@ -83,6 +133,30 @@
     padding: 12px;
     max-height: 250px;
     overflow-y: auto;
+    font-size: 0.95em;
+    line-height: 1.6;
+}
+
+.dyk-preview h2, 
+.dyk-preview h3, 
+.dyk-preview h4 {
+    margin-top: 0.5em;
+    margin-bottom: 0.3em;
+    border-bottom: 1px solid #eaecf0;
+    font-weight: bold;
+    color: #202122;
+}
+
+.dyk-preview h2 { font-size: 1.2em; }
+.dyk-preview h3 { font-size: 1.1em; }
+
+.dyk-preview ul, 
+.dyk-preview ol {
+    margin: 0.5em 0 0.5em 1.5em;
+}
+
+.dyk-preview li {
+    margin-bottom: 4px;
 }
 
 .dyk-loading {
