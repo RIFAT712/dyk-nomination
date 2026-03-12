@@ -12,7 +12,9 @@
   "globals": {
     "mw": "readonly",
     "OO": "readonly",
-    "Vue": "readonly"
+    "Vue": "readonly",
+    "DYKCore": "readonly",
+    "getDYKApp": "readonly"
   },
   "rules": {
     "indent": ["error", 2],

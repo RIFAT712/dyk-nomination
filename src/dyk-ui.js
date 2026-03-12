@@ -1,15 +1,17 @@
 /**
  * UI components for the DYK nomination tool.
  */
+/* eslint-disable no-redeclare, no-unused-vars */
 const getDYKApp = (require, initialState) => {
-    const { ref, reactive, computed, watch, nextTick, onMounted, onUnmounted } = require('vue');
-    const {
-        CdxDialog, CdxButton, CdxTextInput, CdxTextArea,
-        CdxSelect, CdxField, CdxProgressBar, CdxIcon, CdxRadio, CdxMessage
-    } = require('@wikimedia/codex');
+/* eslint-enable no-redeclare, no-unused-vars */
+  const { ref, reactive, computed, watch, nextTick, onMounted, onUnmounted } = require('vue');
+  const {
+    CdxDialog, CdxButton, CdxTextInput, CdxTextArea,
+    CdxSelect, CdxField, CdxProgressBar, CdxIcon, CdxRadio, CdxMessage
+  } = require('@wikimedia/codex');
 
-    return {
-        template: `
+  return {
+    template: `
             <cdx-dialog
                 v-if="visible"
                 :title="title"
@@ -215,219 +217,219 @@ const getDYKApp = (require, initialState) => {
                 </template>
             </cdx-dialog>
         `,
-        components: {
-            CdxDialog, CdxButton, CdxTextInput, CdxTextArea, CdxSelect, CdxField, CdxProgressBar, CdxIcon, CdxRadio, CdxMessage
-        },
-        setup() {
-            const visible = ref(false);
-            const loading = ref(false);
-            const previewHtml = ref('');
-            const suggestions = ref([]);
-            const imageSuggestions = ref([]);
-            const title = "আজাকি মনোনয়ন";
-            const isNamespace0 = ref(initialState.isNamespace0);
-            const icons = reactive({});
-            const globalError = ref('');
+    components: {
+      CdxDialog, CdxButton, CdxTextInput, CdxTextArea, CdxSelect, CdxField, CdxProgressBar, CdxIcon, CdxRadio, CdxMessage
+    },
+    setup() {
+      const visible = ref(false);
+      const loading = ref(false);
+      const previewHtml = ref('');
+      const suggestions = ref([]);
+      const imageSuggestions = ref([]);
+      const title = 'আজাকি মনোনয়ন';
+      const isNamespace0 = ref(initialState.isNamespace0);
+      const icons = reactive({});
+      const globalError = ref('');
 
-            const form = reactive({
-                article: initialState.article || '',
-                nominator: initialState.userName || '',
-                status: 'নতুন',
-                image: '',
-                caption: '',
-                mainHook: '',
-                altHooks: []
-            });
+      const form = reactive({
+        article: initialState.article || '',
+        nominator: initialState.userName || '',
+        status: 'নতুন',
+        image: '',
+        caption: '',
+        mainHook: '',
+        altHooks: []
+      });
 
-            const errors = reactive({ article: '', image: '' });
-            const hasErrors = computed(() => !!errors.article || !!errors.image);
-            const statusOptions = [{ value: 'নতুন', label: 'নতুন' }, { value: 'বর্ধিত', label: 'বর্ধিত' }];
-            const bDigits = DYKCore.toBengaliDigits;
+      const errors = reactive({ article: '', image: '' });
+      const hasErrors = computed(() => !!errors.article || !!errors.image);
+      const statusOptions = [{ value: 'নতুন', label: 'নতুন' }, { value: 'বর্ধিত', label: 'বর্ধিত' }];
+      const bDigits = DYKCore.toBengaliDigits;
 
-            function open(article) {
-                visible.value = true;
-                if (article) {
-                    form.article = article;
-                    validateArticle();
-                }
-            }
-
-            // Load icons from the MediaWiki API on mount.
-            onMounted(async () => {
-                const api = new mw.Api({ userAgent: 'DYKNominationTool/1.0.0' });
-                const iconNames = [
-                    'cdxIconSearch', 'cdxIconUserAvatar', 'cdxIconArticle',
-                    'cdxIconImage', 'cdxIconEdit', 'cdxIconAdd', 'cdxIconTrash',
-                    'cdxIconHelpNotice', 'cdxIconEye', 'cdxIconCheck', 'cdxIconCopy'
-                ];
-                const data = await api.get({ action: 'query', list: 'codexicons', names: iconNames });
-                Object.assign(icons, data.query.codexicons);
-
-                document.addEventListener('click', handleGlobalClick);
-            });
-
-            onUnmounted(() => {
-                document.removeEventListener('click', handleGlobalClick);
-            });
-
-            function handleGlobalClick(e) {
-                const wrapper = e.target.closest('.dyk-suggest-wrapper');
-                if (!wrapper) {
-                    suggestions.value = [];
-                    imageSuggestions.value = [];
-                } else {
-                    if (wrapper.querySelector('.article-input')) {
-                        imageSuggestions.value = [];
-                    } else if (wrapper.querySelector('.image-input')) {
-                        suggestions.value = [];
-                    }
-                }
-            }
-
-            // Calculate how many characters are left for the hook.
-            const remainingChars = computed(() => {
-                const MAX = 200;
-                const stripWikitext = (t) => t.replace(/\[\[(?:[^\|\]]*\|)?([^\]]+)\]\]/g, '$1');
-                const len = stripWikitext(form.mainHook).length;
-                return MAX - len;
-            });
-
-            watch(() => form.mainHook, (newVal) => { if (!newVal.trim()) previewHtml.value = ''; });
-
-            function close() { visible.value = false; reset(); }
-
-            function reset() {
-                if (!isNamespace0.value) form.article = '';
-                form.image = ''; form.caption = ''; form.mainHook = ''; form.altHooks = [];
-                previewHtml.value = ''; suggestions.value = []; imageSuggestions.value = [];
-                globalError.value = ''; errors.article = ''; errors.image = '';
-            }
-
-            let suggestTimeout;
-            async function handleArticleInput() {
-                clearTimeout(suggestTimeout);
-                imageSuggestions.value = []; // Clear other
-                errors.article = ''; // Clear error on typing
-
-                if (!isNamespace0.value && form.article.length > 2) {
-                    suggestTimeout = setTimeout(async () => {
-                        suggestions.value = await DYKCore.fetchSuggestions(form.article);
-                    }, 300);
-                } else suggestions.value = [];
-            }
-
-            async function validateArticle() {
-                if (!form.article.trim()) return;
-
-                // Only validate if user stopped typing or blurred
-                const result = await DYKCore.checkPageExists(form.article);
-                if (!result.exists) {
-                    errors.article = 'নিবন্ধটি উইকিপিডিয়ায় পাওয়া যায়নি।';
-                } else if (result.namespace !== 0) {
-                    // Check if it's main namespace (0). DYK usually only for articles.
-                    // But sometimes User sandbox is allowed? Strict for now.
-                    errors.article = 'শুধুমাত্র মূল নামস্থান (Main Namespace) এর নিবন্ধ গ্রহণযোগ্য।';
-                } else {
-                    errors.article = '';
-                }
-            }
-
-            async function handleImageInput() {
-                clearTimeout(suggestTimeout);
-                suggestions.value = []; // Clear other
-                errors.image = '';
-
-                if (form.image.length > 2) {
-                    suggestTimeout = setTimeout(async () => {
-                        imageSuggestions.value = await DYKCore.fetchImageSuggestions(form.image);
-                    }, 300);
-                } else imageSuggestions.value = [];
-            }
-
-            function selectSuggestion(s) { form.article = s; suggestions.value = []; validateArticle(); }
-            function selectImageSuggestion(s) { form.image = s; imageSuggestions.value = []; }
-            function addAltHook() { if (form.altHooks.length < 4) form.altHooks.push(''); }
-            function removeAltHook(index) { form.altHooks.splice(index, 1); }
-
-            // Basic validation for the form fields.
-            async function validate() {
-                let isValid = true;
-                globalError.value = '';
-                errors.article = ''; errors.image = '';
-
-                if (!form.article.trim()) { errors.article = 'নিবন্ধের নাম প্রয়োজনীয়'; isValid = false; }
-                else {
-                    // Double check existence on submit just in case
-                    const result = await DYKCore.checkPageExists(form.article);
-                    if (!result.exists) {
-                        errors.article = 'নিবন্ধটি উইকিপিডিয়ায় পাওয়া যায়নি।';
-                        isValid = false;
-                    }
-                }
-
-                if (form.image.trim()) {
-                    const ext = form.image.split('.').pop().toLowerCase();
-                    if (!['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) {
-                        errors.image = 'অবৈধ ছবির ফরম্যাট'; isValid = false;
-                    }
-                }
-
-                if (!form.mainHook.trim()) {
-                    globalError.value = 'মূল ভুক্তি (Hook) প্রদান করা আবশ্যক।';
-                    isValid = false;
-                }
-
-                return isValid;
-            }
-
-            // Generate wikitext and fetch its HTML preview.
-            async function handlePreview() {
-                if (!(await validate())) return;
-                loading.value = true;
-                try {
-                    const creator = await DYKCore.getArticleCreator(form.article);
-                    const wikitext = DYKCore.generateWikitext({ ...form, articleCreator: creator });
-                    previewHtml.value = await DYKCore.getPreview(wikitext, DYKCore.DYK_PAGE);
-                    nextTick(() => DYKCore.fixLazyImages($('.dyk-preview')));
-                } catch (e) { previewHtml.value = `<div style="color:#d33">${e.message}</div>`; }
-                finally { loading.value = false; }
-            }
-
-            async function copyWikitext() {
-                try {
-                    const creator = await DYKCore.getArticleCreator(form.article);
-                    const wikitext = DYKCore.generateWikitext({ ...form, articleCreator: creator });
-                    navigator.clipboard.writeText(wikitext).then(() => {
-                        mw.notify('উইকিটেক্সট কপি করা হয়েছে!');
-                    });
-                } catch (e) {
-                    mw.notify('কপি করতে ব্যর্থ: ' + e.message, { type: 'error' });
-                }
-            }
-
-            // Post the nomination to the wiki.
-            async function handleSubmit() {
-                if (!(await validate())) return;
-                loading.value = true;
-                try {
-                    const creator = await DYKCore.getArticleCreator(form.article);
-                    const wikitext = DYKCore.generateWikitext({ ...form, articleCreator: creator });
-                    await DYKCore.postNomination(DYKCore.DYK_PAGE, wikitext, 'আজাকি মনোনয়ন যোগ করা হয়েছে');
-                    mw.notify('সফলভাবে আজাকি মনোনয়ন যুক্ত হয়েছে!');
-                    close();
-                    if (mw.config.get('wgPageName') === DYKCore.DYK_PAGE) location.reload();
-                } catch (e) { mw.notify(e.message, { type: 'error' }); }
-                finally { loading.value = false; }
-            }
-
-            return {
-                visible, loading, form, errors, hasErrors, statusOptions, title, isNamespace0,
-                previewHtml, suggestions, imageSuggestions, remainingChars, bDigits, icons, globalError,
-                open, close, handleArticleInput, handleImageInput, selectSuggestion, selectImageSuggestion,
-                addAltHook, removeAltHook, handlePreview, handleSubmit, validateArticle, copyWikitext,
-                openMainPage: () => window.open(mw.util.getUrl('উইকিপিডিয়া:আপনি জানেন কি'), '_blank')
-            };
+      function open(article) {
+        visible.value = true;
+        if (article) {
+          form.article = article;
+          validateArticle();
         }
-    };
+      }
+
+      // Load icons from the MediaWiki API on mount.
+      onMounted(async () => {
+        const api = new mw.Api({ userAgent: 'DYKNominationTool/1.0.0' });
+        const iconNames = [
+          'cdxIconSearch', 'cdxIconUserAvatar', 'cdxIconArticle',
+          'cdxIconImage', 'cdxIconEdit', 'cdxIconAdd', 'cdxIconTrash',
+          'cdxIconHelpNotice', 'cdxIconEye', 'cdxIconCheck', 'cdxIconCopy'
+        ];
+        const data = await api.get({ action: 'query', list: 'codexicons', names: iconNames });
+        Object.assign(icons, data.query.codexicons);
+
+        document.addEventListener('click', handleGlobalClick);
+      });
+
+      onUnmounted(() => {
+        document.removeEventListener('click', handleGlobalClick);
+      });
+
+      function handleGlobalClick(e) {
+        const wrapper = e.target.closest('.dyk-suggest-wrapper');
+        if (!wrapper) {
+          suggestions.value = [];
+          imageSuggestions.value = [];
+        } else {
+          if (wrapper.querySelector('.article-input')) {
+            imageSuggestions.value = [];
+          } else if (wrapper.querySelector('.image-input')) {
+            suggestions.value = [];
+          }
+        }
+      }
+
+      // Calculate how many characters are left for the hook.
+      const remainingChars = computed(() => {
+        const MAX = 200;
+        const stripWikitext = (t) => t.replace(/\[\[(?:[^|\]]*\|)?([^\]]+)\]\]/g, '$1');
+        const len = stripWikitext(form.mainHook).length;
+        return MAX - len;
+      });
+
+      watch(() => form.mainHook, (newVal) => { if (!newVal.trim()) previewHtml.value = ''; });
+
+      function close() { visible.value = false; reset(); }
+
+      function reset() {
+        if (!isNamespace0.value) form.article = '';
+        form.image = ''; form.caption = ''; form.mainHook = ''; form.altHooks = [];
+        previewHtml.value = ''; suggestions.value = []; imageSuggestions.value = [];
+        globalError.value = ''; errors.article = ''; errors.image = '';
+      }
+
+      let suggestTimeout;
+      async function handleArticleInput() {
+        clearTimeout(suggestTimeout);
+        imageSuggestions.value = []; // Clear other
+        errors.article = ''; // Clear error on typing
+
+        if (!isNamespace0.value && form.article.length > 2) {
+          suggestTimeout = setTimeout(async () => {
+            suggestions.value = await DYKCore.fetchSuggestions(form.article);
+          }, 300);
+        } else suggestions.value = [];
+      }
+
+      async function validateArticle() {
+        if (!form.article.trim()) return;
+
+        // Only validate if user stopped typing or blurred
+        const result = await DYKCore.checkPageExists(form.article);
+        if (!result.exists) {
+          errors.article = 'নিবন্ধটি উইকিপিডিয়ায় পাওয়া যায়নি।';
+        } else if (result.namespace !== 0) {
+          // Check if it's main namespace (0). DYK usually only for articles.
+          // But sometimes User sandbox is allowed? Strict for now.
+          errors.article = 'শুধুমাত্র মূল নামস্থান (Main Namespace) এর নিবন্ধ গ্রহণযোগ্য।';
+        } else {
+          errors.article = '';
+        }
+      }
+
+      async function handleImageInput() {
+        clearTimeout(suggestTimeout);
+        suggestions.value = []; // Clear other
+        errors.image = '';
+
+        if (form.image.length > 2) {
+          suggestTimeout = setTimeout(async () => {
+            imageSuggestions.value = await DYKCore.fetchImageSuggestions(form.image);
+          }, 300);
+        } else imageSuggestions.value = [];
+      }
+
+      function selectSuggestion(s) { form.article = s; suggestions.value = []; validateArticle(); }
+      function selectImageSuggestion(s) { form.image = s; imageSuggestions.value = []; }
+      function addAltHook() { if (form.altHooks.length < 4) form.altHooks.push(''); }
+      function removeAltHook(index) { form.altHooks.splice(index, 1); }
+
+      // Basic validation for the form fields.
+      async function validate() {
+        let isValid = true;
+        globalError.value = '';
+        errors.article = ''; errors.image = '';
+
+        if (!form.article.trim()) { errors.article = 'নিবন্ধের নাম প্রয়োজনীয়'; isValid = false; }
+        else {
+          // Double check existence on submit just in case
+          const result = await DYKCore.checkPageExists(form.article);
+          if (!result.exists) {
+            errors.article = 'নিবন্ধটি উইকিপিডিয়ায় পাওয়া যায়নি।';
+            isValid = false;
+          }
+        }
+
+        if (form.image.trim()) {
+          const ext = form.image.split('.').pop().toLowerCase();
+          if (!['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) {
+            errors.image = 'অবৈধ ছবির ফরম্যাট'; isValid = false;
+          }
+        }
+
+        if (!form.mainHook.trim()) {
+          globalError.value = 'মূল ভুক্তি (Hook) প্রদান করা আবশ্যক।';
+          isValid = false;
+        }
+
+        return isValid;
+      }
+
+      // Generate wikitext and fetch its HTML preview.
+      async function handlePreview() {
+        if (!(await validate())) return;
+        loading.value = true;
+        try {
+          const creator = await DYKCore.getArticleCreator(form.article);
+          const wikitext = DYKCore.generateWikitext({ ...form, articleCreator: creator });
+          previewHtml.value = await DYKCore.getPreview(wikitext, DYKCore.DYK_PAGE);
+          nextTick(() => DYKCore.fixLazyImages($('.dyk-preview')));
+        } catch (e) { previewHtml.value = `<div style="color:#d33">${e.message}</div>`; }
+        finally { loading.value = false; }
+      }
+
+      async function copyWikitext() {
+        try {
+          const creator = await DYKCore.getArticleCreator(form.article);
+          const wikitext = DYKCore.generateWikitext({ ...form, articleCreator: creator });
+          navigator.clipboard.writeText(wikitext).then(() => {
+            mw.notify('উইকিটেক্সট কপি করা হয়েছে!');
+          });
+        } catch (e) {
+          mw.notify('কপি করতে ব্যর্থ: ' + e.message, { type: 'error' });
+        }
+      }
+
+      // Post the nomination to the wiki.
+      async function handleSubmit() {
+        if (!(await validate())) return;
+        loading.value = true;
+        try {
+          const creator = await DYKCore.getArticleCreator(form.article);
+          const wikitext = DYKCore.generateWikitext({ ...form, articleCreator: creator });
+          await DYKCore.postNomination(DYKCore.DYK_PAGE, wikitext, 'আজাকি মনোনয়ন যোগ করা হয়েছে');
+          mw.notify('সফলভাবে আজাকি মনোনয়ন যুক্ত হয়েছে!');
+          close();
+          if (mw.config.get('wgPageName') === DYKCore.DYK_PAGE) location.reload();
+        } catch (e) { mw.notify(e.message, { type: 'error' }); }
+        finally { loading.value = false; }
+      }
+
+      return {
+        visible, loading, form, errors, hasErrors, statusOptions, title, isNamespace0,
+        previewHtml, suggestions, imageSuggestions, remainingChars, bDigits, icons, globalError,
+        open, close, handleArticleInput, handleImageInput, selectSuggestion, selectImageSuggestion,
+        addAltHook, removeAltHook, handlePreview, handleSubmit, validateArticle, copyWikitext,
+        openMainPage: () => window.open(mw.util.getUrl('উইকিপিডিয়া:আপনি জানেন কি'), '_blank')
+      };
+    }
+  };
 };
 
