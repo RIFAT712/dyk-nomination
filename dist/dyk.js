@@ -6,7 +6,7 @@ const getDYKApp = (require, initialState) => {
     const { ref, reactive, computed, watch, nextTick, onMounted, onUnmounted } = require('vue');
     const {
         CdxDialog, CdxButton, CdxTextInput, CdxTextArea,
-        CdxSelect, CdxField, CdxProgressBar, CdxIcon, CdxRadio
+        CdxSelect, CdxField, CdxProgressBar, CdxIcon, CdxRadio, CdxMessage
     } = require('@wikimedia/codex');
 
     return {
@@ -22,10 +22,16 @@ const getDYKApp = (require, initialState) => {
                 class="dyk-custom-dialog"
             >
                 <div class="dyk-form">
+                    <!-- Global Error Message -->
+                    <cdx-message v-if="globalError" type="error" :fade-in="true" style="margin-bottom: 16px;">
+                        {{ globalError }}
+                    </cdx-message>
+
                     <!-- Article and Nominator section -->
                     <div class="dyk-form-section">
                         <cdx-field :status="errors.article ? 'error' : 'default'" :messages="errors.article ? { error: errors.article } : {}">
                             <template #label>নিবন্ধের নাম</template>
+                            <template #description>যে নিবন্ধটি আপনি মনোনীত করতে চান।</template>
                             <div class="dyk-suggest-wrapper" @mousedown.stop>
                                 <cdx-text-input 
                                     v-model="form.article" 
@@ -33,6 +39,7 @@ const getDYKApp = (require, initialState) => {
                                     placeholder="নিবন্ধের নাম প্রদান করুন..."
                                     :start-icon="icons.cdxIconSearch"
                                     @input="handleArticleInput"
+                                    @blur="validateArticle"
                                     class="progressive-input article-input"
                                 />
                                 <div v-if="suggestions.length && !isNamespace0" class="dyk-suggestions">
@@ -48,25 +55,27 @@ const getDYKApp = (require, initialState) => {
                             </div>
                         </cdx-field>
 
-                        <cdx-field>
-                            <template #label>মনোনয়নকারীর নাম</template>
-                            <cdx-text-input v-model="form.nominator" disabled :start-icon="icons.cdxIconUserAvatar" />
-                        </cdx-field>
+                        <div class="dyk-row">
+                            <cdx-field class="dyk-nominator-field">
+                                <template #label>মনোনয়নকারীর নাম</template>
+                                <cdx-text-input v-model="form.nominator" disabled :start-icon="icons.cdxIconUserAvatar" />
+                            </cdx-field>
 
-                        <cdx-field>
-                            <template #label>নিবন্ধের অবস্থা</template>
-                            <div class="dyk-radio-group">
-                                <cdx-radio
-                                    v-for="option in statusOptions"
-                                    :key="option.value"
-                                    v-model="form.status"
-                                    :input-value="option.value"
-                                    inline
-                                >
-                                    {{ option.label }}
-                                </cdx-radio>
-                            </div>
-                        </cdx-field>
+                            <cdx-field class="dyk-status-field">
+                                <template #label>নিবন্ধের অবস্থা</template>
+                                <div class="dyk-radio-group">
+                                    <cdx-radio
+                                        v-for="option in statusOptions"
+                                        :key="option.value"
+                                        v-model="form.status"
+                                        :input-value="option.value"
+                                        inline
+                                    >
+                                        {{ option.label }}
+                                    </cdx-radio>
+                                </div>
+                            </cdx-field>
+                        </div>
                     <!-- Image and caption section -->
                         <cdx-field :status="errors.image ? 'error' : 'default'" :messages="errors.image ? { error: errors.image } : {}">
                             <template #label>ছবি প্রদান করুন (ঐচ্ছিক)</template>
@@ -115,7 +124,7 @@ const getDYKApp = (require, initialState) => {
                         
                         <cdx-text-area
                             v-model="form.mainHook"
-                            placeholder="মূল ভুক্তি লিখুন..."
+                            placeholder="মূল ভুক্তি লিখুন (যেমন: ...পাখিটি আকাশে উড়তে পারে?)"
                             :rows="2"
                             autosize
                             class="dyk-full-width"
@@ -156,8 +165,19 @@ const getDYKApp = (require, initialState) => {
                     <!-- Live preview section -->
                     <div v-if="previewHtml" class="dyk-preview-container">
                         <div class="dyk-preview-label">
-                            <cdx-icon :icon="icons.cdxIconEye" size="small" style="margin-right: 8px;"></cdx-icon>
-                            প্রাকদর্শন:
+                            <div style="display:flex; align-items:center;">
+                                <cdx-icon :icon="icons.cdxIconEye" size="small" style="margin-right: 8px;"></cdx-icon>
+                                প্রাকদর্শন
+                            </div>
+                            <cdx-button 
+                                weight="quiet" 
+                                size="small"
+                                @click="copyWikitext"
+                                title="উইকিটেক্সট কপি করুন"
+                            >
+                                <cdx-icon :icon="icons.cdxIconCopy"></cdx-icon>
+                                কপি
+                            </cdx-button>
                         </div>
                         <div class="dyk-preview mw-parser-output" v-html="previewHtml"></div>
                     </div>
@@ -167,11 +187,13 @@ const getDYKApp = (require, initialState) => {
                 <template #footer>
                     <div class="dyk-footer-container">
                         <div class="dyk-footer-left">
-                            <cdx-button @click="openMainPage" class="dyk-secondary-btn">
+                            <cdx-button @click="openMainPage" class="dyk-secondary-btn" weight="quiet">
                                 <cdx-icon :icon="icons.cdxIconHelpNotice"></cdx-icon>
                                 নির্দেশিকা
                             </cdx-button>
-                            <cdx-button 
+                        </div>
+                        <div class="dyk-footer-right">
+                             <cdx-button 
                                 @click="handlePreview" 
                                 :disabled="loading || !form.article || !form.mainHook" 
                                 class="dyk-secondary-btn"
@@ -179,13 +201,11 @@ const getDYKApp = (require, initialState) => {
                                 <cdx-icon :icon="icons.cdxIconArticle" class="progressive-input"></cdx-icon>
                                 প্রাকদর্শন
                             </cdx-button>
-                        </div>
-                        <div class="dyk-footer-right">
                             <cdx-button 
                                 @click="handleSubmit" 
                                 action="progressive" 
                                 weight="primary" 
-                                :disabled="loading || !form.article || !form.mainHook" 
+                                :disabled="loading || !form.article || !form.mainHook || hasErrors" 
                                 class="dyk-submit-btn"
                             >
                                 <cdx-icon :icon="icons.cdxIconCheck"></cdx-icon>
@@ -197,7 +217,7 @@ const getDYKApp = (require, initialState) => {
             </cdx-dialog>
         `,
         components: {
-            CdxDialog, CdxButton, CdxTextInput, CdxTextArea, CdxSelect, CdxField, CdxProgressBar, CdxIcon, CdxRadio
+            CdxDialog, CdxButton, CdxTextInput, CdxTextArea, CdxSelect, CdxField, CdxProgressBar, CdxIcon, CdxRadio, CdxMessage
         },
         setup() {
             const visible = ref(false);
@@ -208,6 +228,7 @@ const getDYKApp = (require, initialState) => {
             const title = "আজাকি মনোনয়ন";
             const isNamespace0 = ref(initialState.isNamespace0);
             const icons = reactive({});
+            const globalError = ref('');
 
             const form = reactive({
                 article: initialState.article || '',
@@ -220,12 +241,16 @@ const getDYKApp = (require, initialState) => {
             });
 
             const errors = reactive({ article: '', image: '' });
+            const hasErrors = computed(() => !!errors.article || !!errors.image);
             const statusOptions = [{ value: 'নতুন', label: 'নতুন' }, { value: 'বর্ধিত', label: 'বর্ধিত' }];
             const bDigits = DYKCore.toBengaliDigits;
 
             function open(article) {
                 visible.value = true;
-                if (article) form.article = article;
+                if (article) {
+                    form.article = article;
+                    validateArticle();
+                }
             }
 
             // Load icons from the MediaWiki API on mount.
@@ -234,12 +259,11 @@ const getDYKApp = (require, initialState) => {
                 const iconNames = [
                     'cdxIconSearch', 'cdxIconUserAvatar', 'cdxIconArticle',
                     'cdxIconImage', 'cdxIconEdit', 'cdxIconAdd', 'cdxIconTrash',
-                    'cdxIconHelpNotice', 'cdxIconEye', 'cdxIconCheck'
+                    'cdxIconHelpNotice', 'cdxIconEye', 'cdxIconCheck', 'cdxIconCopy'
                 ];
                 const data = await api.get({ action: 'query', list: 'codexicons', names: iconNames });
                 Object.assign(icons, data.query.codexicons);
 
-                // Close suggestions when clicking outside.
                 document.addEventListener('click', handleGlobalClick);
             });
 
@@ -253,7 +277,6 @@ const getDYKApp = (require, initialState) => {
                     suggestions.value = [];
                     imageSuggestions.value = [];
                 } else {
-                    // If clicked inside a wrapper, clear the suggestions of the OTHER wrapper
                     if (wrapper.querySelector('.article-input')) {
                         imageSuggestions.value = [];
                     } else if (wrapper.querySelector('.image-input')) {
@@ -278,12 +301,15 @@ const getDYKApp = (require, initialState) => {
                 if (!isNamespace0.value) form.article = '';
                 form.image = ''; form.caption = ''; form.mainHook = ''; form.altHooks = [];
                 previewHtml.value = ''; suggestions.value = []; imageSuggestions.value = [];
+                globalError.value = ''; errors.article = ''; errors.image = '';
             }
 
             let suggestTimeout;
             async function handleArticleInput() {
                 clearTimeout(suggestTimeout);
                 imageSuggestions.value = []; // Clear other
+                errors.article = ''; // Clear error on typing
+
                 if (!isNamespace0.value && form.article.length > 2) {
                     suggestTimeout = setTimeout(async () => {
                         suggestions.value = await DYKCore.fetchSuggestions(form.article);
@@ -291,9 +317,27 @@ const getDYKApp = (require, initialState) => {
                 } else suggestions.value = [];
             }
 
+            async function validateArticle() {
+                if (!form.article.trim()) return;
+
+                // Only validate if user stopped typing or blurred
+                const result = await DYKCore.checkPageExists(form.article);
+                if (!result.exists) {
+                    errors.article = 'নিবন্ধটি উইকিপিডিয়ায় পাওয়া যায়নি।';
+                } else if (result.namespace !== 0) {
+                    // Check if it's main namespace (0). DYK usually only for articles.
+                    // But sometimes User sandbox is allowed? Strict for now.
+                    errors.article = 'শুধুমাত্র মূল নামস্থান (Main Namespace) এর নিবন্ধ গ্রহণযোগ্য।';
+                } else {
+                    errors.article = '';
+                }
+            }
+
             async function handleImageInput() {
                 clearTimeout(suggestTimeout);
                 suggestions.value = []; // Clear other
+                errors.image = '';
+
                 if (form.image.length > 2) {
                     suggestTimeout = setTimeout(async () => {
                         imageSuggestions.value = await DYKCore.fetchImageSuggestions(form.image);
@@ -301,28 +345,45 @@ const getDYKApp = (require, initialState) => {
                 } else imageSuggestions.value = [];
             }
 
-            function selectSuggestion(s) { form.article = s; suggestions.value = []; }
+            function selectSuggestion(s) { form.article = s; suggestions.value = []; validateArticle(); }
             function selectImageSuggestion(s) { form.image = s; imageSuggestions.value = []; }
             function addAltHook() { if (form.altHooks.length < 4) form.altHooks.push(''); }
             function removeAltHook(index) { form.altHooks.splice(index, 1); }
 
             // Basic validation for the form fields.
-            function validate() {
+            async function validate() {
                 let isValid = true;
+                globalError.value = '';
                 errors.article = ''; errors.image = '';
+
                 if (!form.article.trim()) { errors.article = 'নিবন্ধের নাম প্রয়োজনীয়'; isValid = false; }
+                else {
+                    // Double check existence on submit just in case
+                    const result = await DYKCore.checkPageExists(form.article);
+                    if (!result.exists) {
+                        errors.article = 'নিবন্ধটি উইকিপিডিয়ায় পাওয়া যায়নি।';
+                        isValid = false;
+                    }
+                }
+
                 if (form.image.trim()) {
                     const ext = form.image.split('.').pop().toLowerCase();
                     if (!['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) {
                         errors.image = 'অবৈধ ছবির ফরম্যাট'; isValid = false;
                     }
                 }
-                return isValid && form.mainHook.trim() !== '';
+
+                if (!form.mainHook.trim()) {
+                    globalError.value = 'মূল ভুক্তি (Hook) প্রদান করা আবশ্যক।';
+                    isValid = false;
+                }
+
+                return isValid;
             }
 
             // Generate wikitext and fetch its HTML preview.
             async function handlePreview() {
-                if (!validate()) return;
+                if (!(await validate())) return;
                 loading.value = true;
                 try {
                     const creator = await DYKCore.getArticleCreator(form.article);
@@ -333,9 +394,21 @@ const getDYKApp = (require, initialState) => {
                 finally { loading.value = false; }
             }
 
+            async function copyWikitext() {
+                try {
+                    const creator = await DYKCore.getArticleCreator(form.article);
+                    const wikitext = DYKCore.generateWikitext({ ...form, articleCreator: creator });
+                    navigator.clipboard.writeText(wikitext).then(() => {
+                        mw.notify('উইকিটেক্সট কপি করা হয়েছে!');
+                    });
+                } catch (e) {
+                    mw.notify('কপি করতে ব্যর্থ: ' + e.message, { type: 'error' });
+                }
+            }
+
             // Post the nomination to the wiki.
             async function handleSubmit() {
-                if (!validate()) return;
+                if (!(await validate())) return;
                 loading.value = true;
                 try {
                     const creator = await DYKCore.getArticleCreator(form.article);
@@ -349,10 +422,10 @@ const getDYKApp = (require, initialState) => {
             }
 
             return {
-                visible, loading, form, errors, statusOptions, title, isNamespace0,
-                previewHtml, suggestions, imageSuggestions, remainingChars, bDigits, icons,
+                visible, loading, form, errors, hasErrors, statusOptions, title, isNamespace0,
+                previewHtml, suggestions, imageSuggestions, remainingChars, bDigits, icons, globalError,
                 open, close, handleArticleInput, handleImageInput, selectSuggestion, selectImageSuggestion,
-                addAltHook, removeAltHook, handlePreview, handleSubmit,
+                addAltHook, removeAltHook, handlePreview, handleSubmit, validateArticle, copyWikitext,
                 openMainPage: () => window.open(mw.util.getUrl('উইকিপিডিয়া:আপনি জানেন কি'), '_blank')
             };
         }
@@ -369,6 +442,28 @@ const getDYKApp = (require, initialState) => {
 window.DYKCore = (function($) {
     const api = new mw.Api();
     const DYK_PAGE = 'টেমপ্লেট_আলোচনা:আপনি_জানেন_কি';
+
+    /**
+     * Check if a page exists and return its details.
+     */
+    async function checkPageExists(title) {
+        try {
+            const response = await api.get({
+                action: 'query',
+                titles: title,
+                formatversion: 2
+            });
+            const page = response.query.pages[0];
+            return {
+                exists: !page.missing,
+                invalid: page.invalid,
+                namespace: page.ns
+            };
+        } catch (error) {
+            console.error('Error checking page existence:', error);
+            return { exists: false, error: error };
+        }
+    }
 
     /**
      * Parse wikitext to HTML for previewing.
@@ -391,7 +486,7 @@ window.DYKCore = (function($) {
             return response.parse.text['*'];
         } catch (error) {
             console.error('Preview error:', error);
-            throw error;
+            throw new Error('প্রাকদর্শন লোড করতে সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।');
         }
     }
 
@@ -437,7 +532,7 @@ window.DYKCore = (function($) {
                 formatversion: 2
             });
             const page = response.query.pages[0];
-            if (page.missing) {
+            if (!page || page.missing) {
                 throw new Error(`নিবন্ধটি পাওয়া যায়নি: ${title}`);
             }
             return page.revisions[0].user;
@@ -478,6 +573,7 @@ window.DYKCore = (function($) {
             });
             const page = queryResponse.query.pages[0];
             if (!page || page.missing) {
+                // If page doesn't exist, try to create it? Or throw. For DYK page, it SHOULD exist.
                 throw new Error(`পাতাটি পাওয়া যায়নি: ${pageTitle}`);
             }
             const currentContent = page.revisions[0].content || '';
@@ -487,11 +583,11 @@ window.DYKCore = (function($) {
                 title: pageTitle,
                 summary: summary,
                 text: currentContent + '\n\n' + text,
-                minor: true
+                // minor: true // Removed minor, nominations are significant
             });
         } catch (error) {
             console.error('Post nomination error:', error);
-            throw error;
+            throw new Error('মনোনয়ন জমা দিতে সমস্যা হয়েছে। অনুগ্রহ করে আপনার ইন্টারনেট সংযোগ পরীক্ষা করুন।');
         }
     }
 
@@ -510,8 +606,7 @@ window.DYKCore = (function($) {
                 formatversion: 2
             });
             if (!response.query || !response.query.pages) return [];
-            const titles = response.query.pages.map(p => p.title);
-            return [...new Set(titles)];
+            return response.query.pages.map(p => p.title);
         } catch (error) {
             console.error('Fetch suggestions error:', error);
             return [];
@@ -556,6 +651,7 @@ window.DYKCore = (function($) {
 
     return {
         DYK_PAGE,
+        checkPageExists,
         getPreview,
         fixLazyImages,
         getArticleCreator,
@@ -574,11 +670,16 @@ window.DYKCore = (function($) {
 (function() {
     const style = document.createElement('style');
     style.textContent = `.progressive-input .cdx-text-input__input:enabled~.cdx-text-input__icon-vue {
-    color: var(--color-progressive) !important;
+    color: var(--color-progressive, #36c) !important;
 }
 
 .destructive-input .cdx-text-input__input:enabled~.cdx-text-input__icon-vue {
-    color: var(--color-destructive) !important;
+    color: var(--color-destructive, #d33) !important;
+}
+
+.dyk-custom-dialog {
+    /* Ensure dialog isn't too cramped */
+    min-width: 500px;
 }
 
 .dyk-form {
@@ -587,16 +688,57 @@ window.DYKCore = (function($) {
 }
 
 .dyk-form-section {
-    margin-bottom: 16px;
+    margin-bottom: 20px;
     padding-bottom: 16px;
     border-bottom: 1px solid #eaecf0;
     overflow: visible;
 }
 
-.dyk-radio-group {
+.dyk-form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.dyk-row {
     display: flex;
-    gap: 16px;
-    margin-top: 4px;
+    gap: 24px;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.dyk-nominator-field {
+    flex: 0 0 240px !important;
+    margin-top: 16px !important;
+}
+
+.dyk-status-field {
+    flex: 1 1 auto !important;
+    margin-top: 16px !important;
+}
+
+/* Align labels in the same row */
+.dyk-row .cdx-field__label {
+    margin-bottom: 8px !important;
+    display: flex;
+    align-items: center;
+    height: 20px;
+    /* Force labels to have same height */
+}
+
+/* Adjust radio group to align with text input height */
+.dyk-status-field .dyk-radio-group {
+    height: 32px;
+    display: flex;
+    align-items: center;
+    margin-top: 2px;
+    /* Fine-tune to match text input baseline */
+}
+
+/* Ensure radio buttons themselves are centered */
+.dyk-status-field .cdx-radio {
+    margin-bottom: 0 !important;
+    padding: 0 4px !important;
 }
 
 .dyk-suggest-wrapper {
@@ -612,17 +754,26 @@ window.DYKCore = (function($) {
     right: 0;
     background: white;
     border: 1px solid #a2a9b1;
-    z-index: 9999;
-    max-height: 200px;
+    border-top: none;
+    z-index: 1000;
+    max-height: 250px;
     overflow-y: auto;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
-    margin-top: 1px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    margin-top: 0;
+    border-radius: 0 0 2px 2px;
 }
 
 .dyk-suggestion-item {
-    padding: 8px 12px;
+    padding: 10px 12px;
     cursor: pointer;
     color: #202122;
+    transition: background-color 0.1s ease;
+    font-size: 14px;
+}
+
+.dyk-suggestion-item:hover {
+    background: #eaf3ff;
+    color: #36c;
 }
 
 .dyk-image-suggestion {
@@ -637,6 +788,7 @@ window.DYKCore = (function($) {
     object-fit: contain;
     background: #f8f9fa;
     border: 1px solid #eaecf0;
+    border-radius: 2px;
     flex-shrink: 0;
 }
 
@@ -648,6 +800,7 @@ window.DYKCore = (function($) {
     align-items: center;
     background: #f8f9fa;
     border: 1px solid #eaecf0;
+    border-radius: 2px;
     flex-shrink: 0;
     color: #72777d;
 }
@@ -658,19 +811,14 @@ window.DYKCore = (function($) {
     white-space: nowrap;
 }
 
-.dyk-suggestion-item:hover {
-    background: #eaf3ff;
-    color: #36c;
-}
-
 .dyk-hooks-section {
-    margin-top: 8px;
+    margin-top: 12px;
 }
 
 .dyk-hooks-header {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     align-items: center;
 }
 
@@ -678,19 +826,22 @@ window.DYKCore = (function($) {
     display: flex;
     gap: 8px;
     align-items: flex-start;
-    margin-top: 10px;
+    margin-top: 12px;
     width: 100%;
 }
 
 .dyk-remove-btn {
     flex-shrink: 0;
+    margin-top: 2px;
+    /* Align with text area */
 }
 
 .dyk-preview-container {
-    margin-top: 20px;
+    margin-top: 24px;
     border: 1px solid #a2a9b1;
     background: #f8f9fa;
     border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .dyk-preview-label {
@@ -702,32 +853,32 @@ window.DYKCore = (function($) {
     font-size: 13px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
 }
 
 .dyk-preview {
-    padding: 12px;
-    max-height: 250px;
+    padding: 16px;
+    max-height: 300px;
     overflow-y: auto;
     font-size: 0.95em;
     line-height: 1.6;
+    background: white;
 }
 
-.dyk-preview h2, 
-.dyk-preview h3, 
+/* Preview Content Styling */
+.dyk-preview h2,
+.dyk-preview h3,
 .dyk-preview h4 {
-    margin-top: 0.5em;
-    margin-bottom: 0.3em;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
     border-bottom: 1px solid #eaecf0;
     font-weight: bold;
     color: #202122;
 }
 
-.dyk-preview h2 { font-size: 1.2em; }
-.dyk-preview h3 { font-size: 1.1em; }
-
-.dyk-preview ul, 
+.dyk-preview ul,
 .dyk-preview ol {
-    margin: 0.5em 0 0.5em 1.5em;
+    margin: 0.5em 0 0.5em 2em;
 }
 
 .dyk-preview li {
@@ -736,7 +887,7 @@ window.DYKCore = (function($) {
 
 .dyk-loading {
     text-align: center;
-    margin: 20px 0;
+    margin: 24px 0;
 }
 
 .dyk-footer-container {
@@ -745,11 +896,13 @@ window.DYKCore = (function($) {
     align-items: center;
     width: 100%;
     box-sizing: border-box;
-    padding: 4px 0;
 }
 
+/* Overrides for Codex Dialog */
 .cdx-dialog__footer {
-    padding: 8px 16px !important;
+    padding: 12px 24px !important;
+    background-color: #f8f9fa;
+    border-top: 1px solid #c8ccd1;
 }
 
 .dyk-footer-left,
@@ -763,19 +916,11 @@ window.DYKCore = (function($) {
 }
 
 .dyk-secondary-btn {
-    border: 1px solid #a2a9b1 !important;
-    font-weight: bold !important;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    font-weight: 600 !important;
 }
 
 .dyk-submit-btn {
-    font-weight: bold !important;
-    padding: 0 24px !important;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    font-weight: 700 !important;
 }
 
 .dyk-add-btn {
@@ -785,44 +930,24 @@ window.DYKCore = (function($) {
     display: flex;
     align-items: center;
     gap: 8px;
+    margin-top: 16px;
+    padding: 8px 0;
 }
 
 .cdx-dialog__header {
-    background: #f8f9fa;
-    border-bottom: 1px solid #eaecf0;
-    padding: 8px 16px !important;
-    display: flex !important;
-    align-items: center !important;
-    position: relative !important;
+    background: white;
+    border-bottom: 1px solid #c8ccd1;
+    padding: 16px 24px !important;
 }
 
 .cdx-dialog__header__title {
-    text-align: center;
-    width: 100%;
+    font-size: 1.2em;
     font-weight: bold;
-    color: #202122;
 }
 
+/* Ensure close button is positioned correctly if custom styles conflict */
 .cdx-dialog .cdx-button.cdx-dialog__header__close {
-    background-color: #d33 !important;
-    color: white !important;
-    border: 2px solid #b32424 !important;
-    border-radius: 4px !important;
-    position: absolute !important;
-    right: 8px !important;
-    width: 28px !important;
-    height: 28px !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-}
-
-.cdx-dialog .cdx-button.cdx-dialog__header__close:hover {
-    background-color: #b32424 !important;
-}
-
-.cdx-dialog .cdx-button.cdx-dialog__header__close .cdx-button__icon {
-    filter: brightness(0) invert(1) !important;
+    margin-left: auto;
 }`;
     document.head.appendChild(style);
 })();
@@ -831,28 +956,42 @@ window.DYKCore = (function($) {
  * Entry point for the DYK nomination tool.
  */
 (function ($) {
-    mw.loader.using(['vue', '@wikimedia/codex', 'mediawiki.api', 'mediawiki.util', 'mediawiki.user']).then((require) => {
+    // Ensure dependencies are loaded
+    const dependencies = ['vue', '@wikimedia/codex', 'mediawiki.api', 'mediawiki.util', 'mediawiki.user', 'mediawiki.Title'];
+
+    mw.loader.using(dependencies).then((require) => {
         let vm = null;
 
         // Initialize and mount the Vue application.
         function initApp() {
-            if (!vm) {
-                const container = document.body.appendChild(document.createElement('div'));
-                container.id = 'dyk-nomination-app';
-                
-                const initialState = {
-                    article: mw.config.get('wgNamespaceNumber') === 0 ? mw.config.get('wgTitle') : '',
-                    isNamespace0: mw.config.get('wgNamespaceNumber') === 0,
-                    userName: mw.user.getName() || mw.config.get('wgUserName') || ''
-                };
+            try {
+                if (!window.DYKCore) {
+                    console.error('DYKCore logic not loaded.');
+                    mw.notify('DYKCore মডিউল লোড হয়নি। অনুগ্রহ করে স্ক্রিপ্টটি আবার ইনস্টল করুন।', { type: 'error' });
+                    return;
+                }
 
-                const app = require('vue').createApp(getDYKApp(require, initialState));
-                vm = app.mount('#dyk-nomination-app');
-            }
-            
-            // Open the nomination form.
-            if (vm && typeof vm.open === 'function') {
-                vm.open(mw.config.get('wgNamespaceNumber') === 0 ? mw.config.get('wgTitle') : '');
+                if (!vm) {
+                    const container = document.body.appendChild(document.createElement('div'));
+                    container.id = 'dyk-nomination-app';
+                    
+                    const initialState = {
+                        article: mw.config.get('wgNamespaceNumber') === 0 ? mw.config.get('wgTitle') : '',
+                        isNamespace0: mw.config.get('wgNamespaceNumber') === 0,
+                        userName: mw.user.getName() || mw.config.get('wgUserName') || ''
+                    };
+
+                    const app = require('vue').createApp(getDYKApp(require, initialState));
+                    vm = app.mount('#dyk-nomination-app');
+                }
+                
+                // Open the nomination form.
+                if (vm && typeof vm.open === 'function') {
+                    vm.open(mw.config.get('wgNamespaceNumber') === 0 ? mw.config.get('wgTitle') : '');
+                }
+            } catch (e) {
+                console.error('DYK App Initialization Error:', e);
+                mw.notify('DYK অ্যাপ চালু করতে সমস্যা হয়েছে: ' + e.message, { type: 'error' });
             }
         }
 
@@ -860,13 +999,24 @@ window.DYKCore = (function($) {
             // Add a link in the "More" menu for articles.
             if (mw.config.get('wgNamespaceNumber') === 0) {
                 const portletLink = mw.util.addPortletLink('p-cactions', '#', 'আজাকি মনোনয়ন', 'ca-dyk');
-                if (portletLink) $(portletLink).on('click', (e) => { e.preventDefault(); initApp(); });
+                if (portletLink) {
+                    $(portletLink).on('click', (e) => { 
+                        e.preventDefault(); 
+                        initApp(); 
+                    });
+                }
             }
-            // Auto-open if the URL parameter is set or if we're on the nomination page with withJS.
-            if (mw.util.getParamValue('dyk-open') === '1' || (mw.config.get('wgPageName') === DYKCore.DYK_PAGE && location.search.includes('withJS'))) {
+            
+            // Check if we should auto-open based on URL params or special page context
+            const shouldAutoOpen = mw.util.getParamValue('dyk-open') === '1' || 
+                                  (window.DYKCore && mw.config.get('wgPageName') === DYKCore.DYK_PAGE && location.search.includes('withJS'));
+
+            if (shouldAutoOpen) {
                 initApp();
             }
         });
+    }).catch((e) => {
+        console.error('Failed to load DYK dependencies:', e);
     });
 })(jQuery);
 

@@ -1,9 +1,14 @@
 .progressive-input .cdx-text-input__input:enabled~.cdx-text-input__icon-vue {
-    color: var(--color-progressive) !important;
+    color: var(--color-progressive, #36c) !important;
 }
 
 .destructive-input .cdx-text-input__input:enabled~.cdx-text-input__icon-vue {
-    color: var(--color-destructive) !important;
+    color: var(--color-destructive, #d33) !important;
+}
+
+.dyk-custom-dialog {
+    /* Ensure dialog isn't too cramped */
+    min-width: 500px;
 }
 
 .dyk-form {
@@ -12,16 +17,57 @@
 }
 
 .dyk-form-section {
-    margin-bottom: 16px;
+    margin-bottom: 20px;
     padding-bottom: 16px;
     border-bottom: 1px solid #eaecf0;
     overflow: visible;
 }
 
-.dyk-radio-group {
+.dyk-form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.dyk-row {
     display: flex;
-    gap: 16px;
-    margin-top: 4px;
+    gap: 24px;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.dyk-nominator-field {
+    flex: 0 0 240px !important;
+    margin-top: 16px !important;
+}
+
+.dyk-status-field {
+    flex: 1 1 auto !important;
+    margin-top: 16px !important;
+}
+
+/* Align labels in the same row */
+.dyk-row .cdx-field__label {
+    margin-bottom: 8px !important;
+    display: flex;
+    align-items: center;
+    height: 20px;
+    /* Force labels to have same height */
+}
+
+/* Adjust radio group to align with text input height */
+.dyk-status-field .dyk-radio-group {
+    height: 32px;
+    display: flex;
+    align-items: center;
+    margin-top: 2px;
+    /* Fine-tune to match text input baseline */
+}
+
+/* Ensure radio buttons themselves are centered */
+.dyk-status-field .cdx-radio {
+    margin-bottom: 0 !important;
+    padding: 0 4px !important;
 }
 
 .dyk-suggest-wrapper {
@@ -37,17 +83,26 @@
     right: 0;
     background: white;
     border: 1px solid #a2a9b1;
-    z-index: 9999;
-    max-height: 200px;
+    border-top: none;
+    z-index: 1000;
+    max-height: 250px;
     overflow-y: auto;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
-    margin-top: 1px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    margin-top: 0;
+    border-radius: 0 0 2px 2px;
 }
 
 .dyk-suggestion-item {
-    padding: 8px 12px;
+    padding: 10px 12px;
     cursor: pointer;
     color: #202122;
+    transition: background-color 0.1s ease;
+    font-size: 14px;
+}
+
+.dyk-suggestion-item:hover {
+    background: #eaf3ff;
+    color: #36c;
 }
 
 .dyk-image-suggestion {
@@ -62,6 +117,7 @@
     object-fit: contain;
     background: #f8f9fa;
     border: 1px solid #eaecf0;
+    border-radius: 2px;
     flex-shrink: 0;
 }
 
@@ -73,6 +129,7 @@
     align-items: center;
     background: #f8f9fa;
     border: 1px solid #eaecf0;
+    border-radius: 2px;
     flex-shrink: 0;
     color: #72777d;
 }
@@ -83,19 +140,14 @@
     white-space: nowrap;
 }
 
-.dyk-suggestion-item:hover {
-    background: #eaf3ff;
-    color: #36c;
-}
-
 .dyk-hooks-section {
-    margin-top: 8px;
+    margin-top: 12px;
 }
 
 .dyk-hooks-header {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     align-items: center;
 }
 
@@ -103,19 +155,22 @@
     display: flex;
     gap: 8px;
     align-items: flex-start;
-    margin-top: 10px;
+    margin-top: 12px;
     width: 100%;
 }
 
 .dyk-remove-btn {
     flex-shrink: 0;
+    margin-top: 2px;
+    /* Align with text area */
 }
 
 .dyk-preview-container {
-    margin-top: 20px;
+    margin-top: 24px;
     border: 1px solid #a2a9b1;
     background: #f8f9fa;
     border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .dyk-preview-label {
@@ -127,32 +182,32 @@
     font-size: 13px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
 }
 
 .dyk-preview {
-    padding: 12px;
-    max-height: 250px;
+    padding: 16px;
+    max-height: 300px;
     overflow-y: auto;
     font-size: 0.95em;
     line-height: 1.6;
+    background: white;
 }
 
-.dyk-preview h2, 
-.dyk-preview h3, 
+/* Preview Content Styling */
+.dyk-preview h2,
+.dyk-preview h3,
 .dyk-preview h4 {
-    margin-top: 0.5em;
-    margin-bottom: 0.3em;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
     border-bottom: 1px solid #eaecf0;
     font-weight: bold;
     color: #202122;
 }
 
-.dyk-preview h2 { font-size: 1.2em; }
-.dyk-preview h3 { font-size: 1.1em; }
-
-.dyk-preview ul, 
+.dyk-preview ul,
 .dyk-preview ol {
-    margin: 0.5em 0 0.5em 1.5em;
+    margin: 0.5em 0 0.5em 2em;
 }
 
 .dyk-preview li {
@@ -161,7 +216,7 @@
 
 .dyk-loading {
     text-align: center;
-    margin: 20px 0;
+    margin: 24px 0;
 }
 
 .dyk-footer-container {
@@ -170,11 +225,13 @@
     align-items: center;
     width: 100%;
     box-sizing: border-box;
-    padding: 4px 0;
 }
 
+/* Overrides for Codex Dialog */
 .cdx-dialog__footer {
-    padding: 8px 16px !important;
+    padding: 12px 24px !important;
+    background-color: #f8f9fa;
+    border-top: 1px solid #c8ccd1;
 }
 
 .dyk-footer-left,
@@ -188,19 +245,11 @@
 }
 
 .dyk-secondary-btn {
-    border: 1px solid #a2a9b1 !important;
-    font-weight: bold !important;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    font-weight: 600 !important;
 }
 
 .dyk-submit-btn {
-    font-weight: bold !important;
-    padding: 0 24px !important;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    font-weight: 700 !important;
 }
 
 .dyk-add-btn {
@@ -210,42 +259,22 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    margin-top: 16px;
+    padding: 8px 0;
 }
 
 .cdx-dialog__header {
-    background: #f8f9fa;
-    border-bottom: 1px solid #eaecf0;
-    padding: 8px 16px !important;
-    display: flex !important;
-    align-items: center !important;
-    position: relative !important;
+    background: white;
+    border-bottom: 1px solid #c8ccd1;
+    padding: 16px 24px !important;
 }
 
 .cdx-dialog__header__title {
-    text-align: center;
-    width: 100%;
+    font-size: 1.2em;
     font-weight: bold;
-    color: #202122;
 }
 
+/* Ensure close button is positioned correctly if custom styles conflict */
 .cdx-dialog .cdx-button.cdx-dialog__header__close {
-    background-color: #d33 !important;
-    color: white !important;
-    border: 2px solid #b32424 !important;
-    border-radius: 4px !important;
-    position: absolute !important;
-    right: 8px !important;
-    width: 28px !important;
-    height: 28px !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-}
-
-.cdx-dialog .cdx-button.cdx-dialog__header__close:hover {
-    background-color: #b32424 !important;
-}
-
-.cdx-dialog .cdx-button.cdx-dialog__header__close .cdx-button__icon {
-    filter: brightness(0) invert(1) !important;
+    margin-left: auto;
 }

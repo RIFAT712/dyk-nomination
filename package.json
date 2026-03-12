@@ -1,0 +1,27 @@
+{
+  "name": "dyk-nomination",
+  "version": "1.0.0",
+  "description": "A Wikimedia userscript for Did You Know (DYK) nominations on Bengali Wikipedia, migrated from OOUI to Codex.",
+  "main": "src/dyk.js",
+  "scripts": {
+    "build": "powershell ./scripts/build.ps1",
+    "test": "node tests/mock-test.js",
+    "lint": "eslint src/**/*.js",
+    "lint:css": "stylelint src/**/*.css"
+  },
+  "keywords": [
+    "wikipedia",
+    "userscript",
+    "codex",
+    "vue",
+    "bnwiki",
+    "dyk"
+  ],
+  "author": "RIFAT712",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "stylelint": "^16.2.1",
+    "stylelint-config-standard": "^36.0.0"
+  }
+}

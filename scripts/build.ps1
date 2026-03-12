@@ -5,10 +5,10 @@ $header = "// <nowiki>`n"
 $footer = "`n// </nowiki>"
 
 # Specifically use UTF8 encoding for reading to avoid corruption
-$core = Get-Content "dyk-core.js" -Raw -Encoding UTF8
-$ui = Get-Content "dyk-ui.js" -Raw -Encoding UTF8
-$css = Get-Content "dyk-ui.css" -Raw -Encoding UTF8
-$main = Get-Content "dyk.js" -Raw -Encoding UTF8
+$core = Get-Content "src/dyk-core.js" -Raw -Encoding UTF8
+$ui = Get-Content "src/dyk-ui.js" -Raw -Encoding UTF8
+$css = Get-Content "src/dyk-ui.css" -Raw -Encoding UTF8
+$main = Get-Content "src/dyk.js" -Raw -Encoding UTF8
 
 # Create a style injection script
 $styleLoader = @"

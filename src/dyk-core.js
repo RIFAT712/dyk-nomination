@@ -8,6 +8,28 @@ window.DYKCore = (function($) {
     const DYK_PAGE = 'টেমপ্লেট_আলোচনা:আপনি_জানেন_কি';
 
     /**
+     * Check if a page exists and return its details.
+     */
+    async function checkPageExists(title) {
+        try {
+            const response = await api.get({
+                action: 'query',
+                titles: title,
+                formatversion: 2
+            });
+            const page = response.query.pages[0];
+            return {
+                exists: !page.missing,
+                invalid: page.invalid,
+                namespace: page.ns
+            };
+        } catch (error) {
+            console.error('Error checking page existence:', error);
+            return { exists: false, error: error };
+        }
+    }
+
+    /**
      * Parse wikitext to HTML for previewing.
      */
     async function getPreview(wikitext, title) {
@@ -28,7 +50,7 @@ window.DYKCore = (function($) {
             return response.parse.text['*'];
         } catch (error) {
             console.error('Preview error:', error);
-            throw error;
+            throw new Error('প্রাকদর্শন লোড করতে সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।');
         }
     }
 
@@ -74,7 +96,7 @@ window.DYKCore = (function($) {
                 formatversion: 2
             });
             const page = response.query.pages[0];
-            if (page.missing) {
+            if (!page || page.missing) {
                 throw new Error(`নিবন্ধটি পাওয়া যায়নি: ${title}`);
             }
             return page.revisions[0].user;
@@ -115,6 +137,7 @@ window.DYKCore = (function($) {
             });
             const page = queryResponse.query.pages[0];
             if (!page || page.missing) {
+                // If page doesn't exist, try to create it? Or throw. For DYK page, it SHOULD exist.
                 throw new Error(`পাতাটি পাওয়া যায়নি: ${pageTitle}`);
             }
             const currentContent = page.revisions[0].content || '';
@@ -124,11 +147,11 @@ window.DYKCore = (function($) {
                 title: pageTitle,
                 summary: summary,
                 text: currentContent + '\n\n' + text,
-                minor: true
+                // minor: true // Removed minor, nominations are significant
             });
         } catch (error) {
             console.error('Post nomination error:', error);
-            throw error;
+            throw new Error('মনোনয়ন জমা দিতে সমস্যা হয়েছে। অনুগ্রহ করে আপনার ইন্টারনেট সংযোগ পরীক্ষা করুন।');
         }
     }
 
@@ -147,8 +170,7 @@ window.DYKCore = (function($) {
                 formatversion: 2
             });
             if (!response.query || !response.query.pages) return [];
-            const titles = response.query.pages.map(p => p.title);
-            return [...new Set(titles)];
+            return response.query.pages.map(p => p.title);
         } catch (error) {
             console.error('Fetch suggestions error:', error);
             return [];
@@ -193,6 +215,7 @@ window.DYKCore = (function($) {
 
     return {
         DYK_PAGE,
+        checkPageExists,
         getPreview,
         fixLazyImages,
         getArticleCreator,

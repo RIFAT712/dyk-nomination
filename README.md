@@ -2,32 +2,37 @@
 
 This is a Wikimedia userscript for "Did You Know" (DYK) nominations on Bengali Wikipedia (bnwiki), migrated from OOUI to Codex.
 
+## Features
+- **Article Validation:** Checks if the article exists in the main namespace before submission.
+- **Auto-Suggestions:** Provides search suggestions for articles and images.
+- **Live Preview:** Shows a real-time preview of the nomination wikitext.
+- **Character Count:** Tracks hook length to ensure it meets DYK standards (<200 chars).
+- **Copy Wikitext:** Quickly copy the generated wikitext for manual use.
+- **Modern UI:** Built with Vue 3 and Codex for a consistent Wikimedia experience.
+
 ## Structure
-- `dyk-core.js`: Core logic, API calls, and wikitext generation.
-- `dyk-ui.js`: Codex (Vue 3) based UI components.
-- `dyk.js`: Entry point and loader.
-- `ooui.js`: (Deprecated) Old OOUI helper.
+- `src/dyk-core.js`: Core logic, API calls, and wikitext generation.
+- `src/dyk-ui.js`: Codex (Vue 3) based UI components.
+- `src/dyk-ui.css`: Custom styling for the interface.
+- `src/dyk.js`: Entry point and loader.
+- `scripts/build.ps1`: Build script to concatenate files.
+- `tests/`: Mock and unit tests.
 
 ## How to use from GitHub
-1.  Push your changes to this repository.
-2.  Use a loader script on your Wikipedia common.js or a subpage (e.g., `User:R1F4T/dyk-loader.js`):
-
-```javascript
-// Loader
-mw.loader.using(['vue', 'ext.codex.v3', 'mediawiki.api', 'mediawiki.util'], function() {
-    const branch = 'main';
-    const user = 'RIFAT712';
-    const repo = 'dyk-nomination';
-    const cdn = `https://cdn.jsdelivr.net/gh/${user}/${repo}@${branch}`;
-
-    $.getScript(`${cdn}/dyk-core.js`).then(() => {
-        $.getScript(`${cdn}/dyk-ui.js`).then(() => {
-            $.getScript(`${cdn}/dyk.js`);
-        });
-    });
-});
-```
+... (rest of the section) ...
 
 ## Local Development
 To combine files into a single script for easy copy-pasting to Wikipedia:
-Run `build.ps1` (on Windows) or concatenate them manually.
+Run `scripts/build.ps1` (on Windows) to generate `dist/dyk.js`.
+
+```powershell
+./scripts/build.ps1
+```
+
+Or using npm:
+
+```bash
+npm run build
+```
+
+Then copy the content of `dist/dyk.js` to your wiki user script page.
