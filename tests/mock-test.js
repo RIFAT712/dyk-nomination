@@ -1,55 +1,93 @@
-// Simple mock test for DYKCore logic
-// This runs in Node.js or a browser environment where window/global is set up
-
-const jsdom = require("jsdom");
+// Real automated tests for DYKCore logic
+const jsdom = require('jsdom');
 const { JSDOM } = jsdom;
+const path = require('path');
 
-const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
+// Setup JSDOM
+const dom = new JSDOM('<!DOCTYPE html><p>Hello world</p>');
 global.window = dom.window;
 global.document = dom.window.document;
+global.navigator = dom.window.navigator;
+global.Image = dom.window.Image;
 global.jQuery = require('jquery')(dom.window);
 global.$ = global.jQuery;
 
 // Mock MediaWiki API
 global.mw = {
-    config: {
-        get: (key) => {
-            if (key === 'wgUserName') return 'TestUser';
-            return '';
-        }
-    },
-    Api: class Api {
-        constructor() {}
-        get(params) {
-            console.log('API GET:', params);
-            if (params.action === 'query' && params.titles === 'ExistPage') {
-                return Promise.resolve({ query: { pages: [{ pageid: 1, ns: 0, title: 'ExistPage' }] } });
-            }
-            if (params.action === 'query' && params.titles === 'MissingPage') {
-                return Promise.resolve({ query: { pages: [{ missing: true }] } });
-            }
-            return Promise.resolve({});
-        }
-        post(params) {
-            console.log('API POST:', params);
-            return Promise.resolve({});
-        }
+  config: {
+    get: (key) => {
+      if (key === 'wgUserName') return 'TestUser';
+      return '';
     }
+  },
+  Api: class Api {
+    constructor() {}
+    async get(params) {
+      if (params.action === 'query' && params.titles === 'ExistPage') {
+        return { query: { pages: [{ pageid: 1, ns: 0, title: 'ExistPage' }] } };
+      }
+      if (params.action === 'query' && params.titles === 'MissingPage') {
+        return { query: { pages: [{ missing: true }] } };
+      }
+      return { query: { pages: [] } };
+    }
+    async post(params) {
+      return { parse: { text: { '*': '<p>Preview HTML</p>' } } };
+    }
+    async postWithEditToken(params) {
+      return { edit: { result: 'Success' } };
+    }
+  }
 };
 
 // Load DYKCore
-// Note: In a real environment, we'd require the module. 
-// Since DYKCore is IIFE attached to window, we simulate loading it.
-// Ideally, we'd refactor DYKCore to be a CommonJS/ESM module for testing, 
-// but for now we just paste/eval or load it if we can.
-// For this mock test, I will just mock the expected behavior of DYKCore functions 
-// to demonstrate how the TEST file should look if we had the module loaded.
+const DYKCore = require('../src/dyk-core');
 
-/* 
-   Since we can't easily require the local 'dyk-core.js' due to it being an IIFE without exports, 
-   we will assume the logic is tested by pasting it here or by refactoring the core file to export.
-   For this userscript context, I'll write a test that *would* run if included in the suite.
-*/
+// Simple assertion helper
+function assert(condition, message) {
+  if (!condition) {
+    console.error('FAILED:', message);
+    process.exit(1);
+  }
+  console.log('PASSED:', message);
+}
 
-console.log("Mock test setup complete.");
-console.log("To run real tests, integrate with a test runner that loads the scripts.");
+async function runTests() {
+  console.log('Running DYKCore tests...');
+
+  // Test: toBengaliDigits
+  assert(DYKCore.toBengaliDigits(123) === '১২৩', 'toBengaliDigits converts English numbers to Bengali');
+  assert(DYKCore.toBengaliDigits(2026) === '২০২৬', 'toBengaliDigits converts English years to Bengali');
+
+  // Test: generateWikitext
+  const testData = {
+    article: 'Test Article',
+    mainHook: 'this is a test hook',
+    altHooks: ['alternative hook'],
+    image: 'Test.jpg',
+    caption: 'Test Caption',
+    status: 'নতুন',
+    nominator: 'TestUser',
+    articleCreator: 'TestUser'
+  };
+  const wikitext = DYKCore.generateWikitext(testData);
+  assert(wikitext.includes('== Test Article =='), 'Wikitext includes article title');
+  assert(wikitext.includes('*...this is a test hook?'), 'Wikitext includes main hook');
+  assert(wikitext.includes('**\'\'\'বিকল্প:\'\'\' ...alternative hook?'), 'Wikitext includes alternative hook');
+  assert(wikitext.includes('[[File:Test.jpg|100x100px|Test Caption]]'), 'Wikitext includes image and caption');
+  assert(wikitext.includes('স্বমনোনীত;'), 'Wikitext handles self-nomination correctly');
+
+  // Test: checkPageExists (Async)
+  const existResult = await DYKCore.checkPageExists('ExistPage');
+  assert(existResult.exists === true, 'checkPageExists identifies existing pages');
+
+  const missingResult = await DYKCore.checkPageExists('MissingPage');
+  assert(missingResult.exists === false, 'checkPageExists identifies missing pages');
+
+  console.log('\nAll tests passed successfully!');
+}
+
+runTests().catch(err => {
+  console.error('Test suite failed with error:', err);
+  process.exit(1);
+});

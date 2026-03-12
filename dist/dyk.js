@@ -441,14 +441,37 @@ const getDYKApp = (require, initialState) => {
  * Handles API calls, wikitext generation, and other data-related tasks.
  */
 
-window.DYKCore = (function($) {
-  const api = new mw.Api();
+(function(root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    define(['jquery'], factory);
+  } else if (typeof module === 'object' && module.exports) {
+    module.exports = factory(require('jquery'));
+  } else {
+    root.DYKCore = factory(root.jQuery);
+  }
+}(typeof self !== 'undefined' ? self : this, function($) {
+  // We don't initialize mw.Api here directly to allow mocking in tests
   const DYK_PAGE = 'টেমপ্লেট_আলোচনা:আপনি_জানেন_কি';
 
   /**
-     * Check if a page exists and return its details.
-     */
+   * Get the MediaWiki API instance.
+   */
+  function getApi() {
+    if (typeof mw !== 'undefined' && mw.Api) {
+      return new mw.Api();
+    }
+    // In test environment, we expect global.mw to be mocked
+    if (typeof global !== 'undefined' && global.mw && global.mw.Api) {
+      return new global.mw.Api();
+    }
+    throw new Error('MediaWiki API not found');
+  }
+
+  /**
+   * Check if a page exists and return its details.
+   */
   async function checkPageExists(title) {
+    const api = getApi();
     try {
       const response = await api.get({
         action: 'query',
@@ -468,9 +491,10 @@ window.DYKCore = (function($) {
   }
 
   /**
-     * Parse wikitext to HTML for previewing.
-     */
+   * Parse wikitext to HTML for previewing.
+   */
   async function getPreview(wikitext, title) {
+    const api = getApi();
     try {
       const response = await api.post({
         action: 'parse',
@@ -493,8 +517,8 @@ window.DYKCore = (function($) {
   }
 
   /**
-     * Fixes lazy-loaded images in the preview.
-     */
+   * Fixes lazy-loaded images in the preview.
+   */
   function fixLazyImages($container) {
     $container.find('.lazy-image-placeholder').each(function() {
       const $placeholder = $(this);
@@ -520,9 +544,10 @@ window.DYKCore = (function($) {
   }
 
   /**
-     * Get article creator (the user who made the first revision).
-     */
+   * Get article creator (the user who made the first revision).
+   */
   async function getArticleCreator(title) {
+    const api = getApi();
     try {
       const response = await api.get({
         action: 'query',
@@ -540,15 +565,16 @@ window.DYKCore = (function($) {
       return page.revisions[0].user;
     } catch (error) {
       console.error('Error fetching article creator:', error);
-      return mw.config.get('wgUserName'); // Default to current user
+      const userName = (typeof mw !== 'undefined' && mw.config) ? mw.config.get('wgUserName') : 'TestUser';
+      return userName;
     }
   }
 
   /**
-     * Generate the final wikitext for the nomination.
-     */
+   * Generate the final wikitext for the nomination.
+   */
   function generateWikitext(data) {
-    const { article, mainHook, altHooks = [], image, caption, status, nominator, articleCreator } = data;
+    const { article, mainHook, altHooks = [], image = '', caption = '', status, nominator, articleCreator } = data;
     const isSelfNom = nominator === articleCreator;
     const imageTemplate = image.trim() ? `<div style="float:right;margin-left:0.5em;">[[File:${image}|100x100px|${caption}]]</div>` : '';
     const statusText = status === 'নতুন' ? 'কর্তৃক প্রণীত নতুন নিবন্ধ' : 'দ্বারা উল্লেখযোগ্যভাবে বর্ধিত নিবন্ধ;';
@@ -562,9 +588,10 @@ window.DYKCore = (function($) {
   }
 
   /**
-     * Post the nomination to the main DYK page.
-     */
+   * Post the nomination to the main DYK page.
+   */
   async function postNomination(pageTitle, text, summary) {
+    const api = getApi();
     try {
       const queryResponse = await api.get({
         action: 'query',
@@ -575,7 +602,6 @@ window.DYKCore = (function($) {
       });
       const page = queryResponse.query.pages[0];
       if (!page || page.missing) {
-        // If page doesn't exist, try to create it? Or throw. For DYK page, it SHOULD exist.
         throw new Error(`পাতাটি পাওয়া যায়নি: ${pageTitle}`);
       }
       const currentContent = page.revisions[0].content || '';
@@ -584,8 +610,7 @@ window.DYKCore = (function($) {
         action: 'edit',
         title: pageTitle,
         summary: summary,
-        text: currentContent + '\n\n' + text,
-        // minor: true // Removed minor, nominations are significant
+        text: currentContent + '\n\n' + text
       });
     } catch (error) {
       console.error('Post nomination error:', error);
@@ -594,10 +619,11 @@ window.DYKCore = (function($) {
   }
 
   /**
-     * Search for article titles based on user input.
-     */
+   * Search for article titles based on user input.
+   */
   async function fetchSuggestions(query) {
     if (!query) return [];
+    const api = getApi();
     try {
       const response = await api.get({
         action: 'query',
@@ -616,10 +642,11 @@ window.DYKCore = (function($) {
   }
 
   /**
-     * Search for images based on user input.
-     */
+   * Search for images based on user input.
+   */
   async function fetchImageSuggestions(query) {
     if (!query) return [];
+    const api = getApi();
     try {
       const response = await api.get({
         action: 'query',
@@ -645,8 +672,8 @@ window.DYKCore = (function($) {
   }
 
   /**
-     * Simple helper to turn English numbers into Bengali ones.
-     */
+   * Simple helper to turn English numbers into Bengali ones.
+   */
   function toBengaliDigits(num) {
     return num.toString().replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
   }
@@ -664,8 +691,7 @@ window.DYKCore = (function($) {
     toBengaliDigits
   };
 
-})(jQuery);
-
+}));
 
 
 
