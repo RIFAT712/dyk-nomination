@@ -55,6 +55,10 @@ function assert(condition, message) {
 async function runTests() {
   console.log('Running DYKCore tests...');
 
+  // Test: Constants
+  assert(DYKCore.DYK_PAGE === 'টেমপ্লেট_আলোচনা:আপনি_জানেন_কি', 'DYK_PAGE constant is correct');
+  assert(DYKCore.TEST_PAGE === 'ব্যবহারকারী:R1F4T/খেলাঘর', 'TEST_PAGE constant is correct');
+
   // Test: toBengaliDigits
   assert(DYKCore.toBengaliDigits(123) === '১২৩', 'toBengaliDigits converts English numbers to Bengali');
   assert(DYKCore.toBengaliDigits(2026) === '২০২৬', 'toBengaliDigits converts English years to Bengali');

@@ -1,3 +1,4 @@
+/* global define, module, require, global */
 /**
  * Core logic for the DYK nomination tool.
  * Handles API calls, wikitext generation, and other data-related tasks.
@@ -14,6 +15,7 @@
 }(typeof self !== 'undefined' ? self : this, function($) {
   // We don't initialize mw.Api here directly to allow mocking in tests
   const DYK_PAGE = 'টেমপ্লেট_আলোচনা:আপনি_জানেন_কি';
+  const TEST_PAGE = 'ব্যবহারকারী:R1F4T/খেলাঘর';
 
   /**
    * Get the MediaWiki API instance.
@@ -242,6 +244,7 @@
 
   return {
     DYK_PAGE,
+    TEST_PAGE,
     checkPageExists,
     getPreview,
     fixLazyImages,
