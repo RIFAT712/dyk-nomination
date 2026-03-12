@@ -21,6 +21,8 @@
   "license": "MIT",
   "devDependencies": {
     "eslint": "^8.56.0",
+    "jquery": "^4.0.0",
+    "jsdom": "^28.1.0",
     "stylelint": "^16.2.1",
     "stylelint-config-standard": "^36.0.0"
   }
