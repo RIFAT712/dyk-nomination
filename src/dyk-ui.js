@@ -1,9 +1,7 @@
 /**
  * UI components for the DYK nomination tool.
  */
-/* eslint-disable no-redeclare, no-unused-vars */
 const getDYKApp = (require, initialState) => {
-/* eslint-enable no-redeclare, no-unused-vars */
   const { ref, reactive, computed, watch, nextTick, onMounted, onUnmounted } = require('vue');
   const {
     CdxDialog, CdxButton, CdxTextInput, CdxTextArea,
@@ -417,7 +415,7 @@ const getDYKApp = (require, initialState) => {
           const wikitext = DYKCore.generateWikitext({ ...form, articleCreator: creator });
           const targetPage = DYKCore.TEST_MODE ? DYKCore.TEST_PAGE : DYKCore.DYK_PAGE;
           const summary = DYKCore.TEST_MODE ? 'আজাকি মনোনয়ন (পরীক্ষামূলক)' : 'আজাকি মনোনয়ন যোগ করা হয়েছে';
-          
+
           await DYKCore.postNomination(targetPage, wikitext, summary);
           mw.notify(DYKCore.TEST_MODE ? 'সফলভাবে পরীক্ষামূলক মনোনয়ন জমা হয়েছে!' : 'সফলভাবে আজাকি মনোনয়ন যুক্ত হয়েছে!');
           close();
