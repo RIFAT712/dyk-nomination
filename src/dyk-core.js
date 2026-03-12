@@ -16,6 +16,7 @@
   // We don't initialize mw.Api here directly to allow mocking in tests
   const DYK_PAGE = 'টেমপ্লেট_আলোচনা:আপনি_জানেন_কি';
   const TEST_PAGE = 'ব্যবহারকারী:R1F4T/খেলাঘর';
+  const TEST_MODE = true; // Set to true to use TEST_PAGE instead of DYK_PAGE
 
   /**
    * Get the MediaWiki API instance.
@@ -245,6 +246,7 @@
   return {
     DYK_PAGE,
     TEST_PAGE,
+    TEST_MODE,
     checkPageExists,
     getPreview,
     fixLazyImages,

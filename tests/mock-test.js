@@ -58,6 +58,7 @@ async function runTests() {
   // Test: Constants
   assert(DYKCore.DYK_PAGE === 'টেমপ্লেট_আলোচনা:আপনি_জানেন_কি', 'DYK_PAGE constant is correct');
   assert(DYKCore.TEST_PAGE === 'ব্যবহারকারী:R1F4T/খেলাঘর', 'TEST_PAGE constant is correct');
+  assert(typeof DYKCore.TEST_MODE === 'boolean', 'TEST_MODE constant exists and is boolean');
 
   // Test: toBengaliDigits
   assert(DYKCore.toBengaliDigits(123) === '১২৩', 'toBengaliDigits converts English numbers to Bengali');

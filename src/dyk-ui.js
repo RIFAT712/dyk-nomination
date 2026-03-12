@@ -7,7 +7,7 @@ const getDYKApp = (require, initialState) => {
   const { ref, reactive, computed, watch, nextTick, onMounted, onUnmounted } = require('vue');
   const {
     CdxDialog, CdxButton, CdxTextInput, CdxTextArea,
-    CdxSelect, CdxField, CdxProgressBar, CdxIcon, CdxRadio, CdxMessage, CdxCheckbox
+    CdxSelect, CdxField, CdxProgressBar, CdxIcon, CdxRadio, CdxMessage
   } = require('@wikimedia/codex');
 
   return {
@@ -30,37 +30,31 @@ const getDYKApp = (require, initialState) => {
 
                     <!-- Article and Nominator section -->
                     <div class="dyk-form-section">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                            <cdx-field :status="errors.article ? 'error' : 'default'" :messages="errors.article ? { error: errors.article } : {}" style="flex-grow: 1; margin-right: 16px;">
-                                <template #label>নিবন্ধের নাম</template>
-                                <template #description>যে নিবন্ধটি আপনি মনোনীত করতে চান।</template>
-                                <div class="dyk-suggest-wrapper" @mousedown.stop>
-                                    <cdx-text-input 
-                                        v-model="form.article" 
-                                        :disabled="isNamespace0"
-                                        placeholder="নিবন্ধের নাম প্রদান করুন..."
-                                        :start-icon="icons.cdxIconSearch"
-                                        @input="handleArticleInput"
-                                        @blur="validateArticle"
-                                        class="progressive-input article-input"
-                                    />
-                                    <div v-if="suggestions.length && !isNamespace0" class="dyk-suggestions">
-                                        <div 
-                                            v-for="s in suggestions" 
-                                            :key="s" 
-                                            @click.stop="selectSuggestion(s)"
-                                            class="dyk-suggestion-item"
-                                        >
-                                            {{ s }}
-                                        </div>
+                        <cdx-field :status="errors.article ? 'error' : 'default'" :messages="errors.article ? { error: errors.article } : {}">
+                            <template #label>নিবন্ধের নাম</template>
+                            <template #description>যে নিবন্ধটি আপনি মনোনীত করতে চান।</template>
+                            <div class="dyk-suggest-wrapper" @mousedown.stop>
+                                <cdx-text-input 
+                                    v-model="form.article" 
+                                    :disabled="isNamespace0"
+                                    placeholder="নিবন্ধের নাম প্রদান করুন..."
+                                    :start-icon="icons.cdxIconSearch"
+                                    @input="handleArticleInput"
+                                    @blur="validateArticle"
+                                    class="progressive-input article-input"
+                                />
+                                <div v-if="suggestions.length && !isNamespace0" class="dyk-suggestions">
+                                    <div 
+                                        v-for="s in suggestions" 
+                                        :key="s" 
+                                        @click.stop="selectSuggestion(s)"
+                                        class="dyk-suggestion-item"
+                                    >
+                                        {{ s }}
                                     </div>
                                 </div>
-                            </cdx-field>
-
-                            <cdx-checkbox v-model="form.isTesting" style="margin-top: 32px;">
-                                পরীক্ষামূলক মোড
-                            </cdx-checkbox>
-                        </div>
+                            </div>
+                        </cdx-field>
 
                         <div class="dyk-row">
                             <cdx-field class="dyk-nominator-field">
@@ -224,7 +218,7 @@ const getDYKApp = (require, initialState) => {
             </cdx-dialog>
         `,
     components: {
-      CdxDialog, CdxButton, CdxTextInput, CdxTextArea, CdxSelect, CdxField, CdxProgressBar, CdxIcon, CdxRadio, CdxMessage, CdxCheckbox
+      CdxDialog, CdxButton, CdxTextInput, CdxTextArea, CdxSelect, CdxField, CdxProgressBar, CdxIcon, CdxRadio, CdxMessage
     },
     setup() {
       const visible = ref(false);
@@ -244,8 +238,7 @@ const getDYKApp = (require, initialState) => {
         image: '',
         caption: '',
         mainHook: '',
-        altHooks: [],
-        isTesting: false
+        altHooks: []
       });
 
       const errors = reactive({ article: '', image: '' });
@@ -396,7 +389,7 @@ const getDYKApp = (require, initialState) => {
         try {
           const creator = await DYKCore.getArticleCreator(form.article);
           const wikitext = DYKCore.generateWikitext({ ...form, articleCreator: creator });
-          const targetPage = form.isTesting ? DYKCore.TEST_PAGE : DYKCore.DYK_PAGE;
+          const targetPage = DYKCore.TEST_MODE ? DYKCore.TEST_PAGE : DYKCore.DYK_PAGE;
           previewHtml.value = await DYKCore.getPreview(wikitext, targetPage);
           nextTick(() => DYKCore.fixLazyImages($('.dyk-preview')));
         } catch (e) { previewHtml.value = `<div style="color:#d33">${e.message}</div>`; }
@@ -422,11 +415,11 @@ const getDYKApp = (require, initialState) => {
         try {
           const creator = await DYKCore.getArticleCreator(form.article);
           const wikitext = DYKCore.generateWikitext({ ...form, articleCreator: creator });
-          const targetPage = form.isTesting ? DYKCore.TEST_PAGE : DYKCore.DYK_PAGE;
-          const summary = form.isTesting ? 'আজাকি মনোনয়ন (পরীক্ষামূলক)' : 'আজাকি মনোনয়ন যোগ করা হয়েছে';
+          const targetPage = DYKCore.TEST_MODE ? DYKCore.TEST_PAGE : DYKCore.DYK_PAGE;
+          const summary = DYKCore.TEST_MODE ? 'আজাকি মনোনয়ন (পরীক্ষামূলক)' : 'আজাকি মনোনয়ন যোগ করা হয়েছে';
           
           await DYKCore.postNomination(targetPage, wikitext, summary);
-          mw.notify(form.isTesting ? 'সফলভাবে পরীক্ষামূলক মনোনয়ন জমা হয়েছে!' : 'সফলভাবে আজাকি মনোনয়ন যুক্ত হয়েছে!');
+          mw.notify(DYKCore.TEST_MODE ? 'সফলভাবে পরীক্ষামূলক মনোনয়ন জমা হয়েছে!' : 'সফলভাবে আজাকি মনোনয়ন যুক্ত হয়েছে!');
           close();
           if (mw.config.get('wgPageName') === targetPage) location.reload();
         } catch (e) { mw.notify(e.message, { type: 'error' }); }
